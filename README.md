@@ -1,2 +1,1 @@
-# easy-time
-Just improve my skills n stuff.
+# Just improve my skills n stuff.
