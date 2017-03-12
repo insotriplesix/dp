@@ -1,6 +1,7 @@
 #include <iostream>
 
-bool digitСhecker(int number) {
+bool digitСhecker(int number)
+{
 	if (number >= 0 && number <= 9999 || number >= 100000) {
 		std::cout << "Incorrect length." << std::endl;
 		return false;
