@@ -1,6 +1,7 @@
 #include <iostream>
 
-int equation(int a, int b, int f) {
+int equation(int a, int b, int f)
+{
 	return (a + b - f / a) + f * a * a - (a + b);
 }
 
