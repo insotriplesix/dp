@@ -1,8 +1,4 @@
-#include <conio.h>
-#include <ctime>
-#include <iomanip>
 #include <iostream>
-#include <string>
 
 void dump(int val, char c)
 {
@@ -24,6 +20,7 @@ int main()
 {
 	int x, y, m, n, tmp;
 
+	// Must be valid for int range
 	std::cout << "Input x: ";
 	std::cin >> x;
 	std::cout << "Input y: ";
@@ -61,4 +58,3 @@ int main()
 
 	return 0;
 }
-
