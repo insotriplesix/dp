@@ -161,7 +161,7 @@ int main()
 	return 0;
 }
 
-
+/* Generate random account */
 TACC accgen(int i)
 {
 	TACC a;
@@ -174,6 +174,7 @@ TACC accgen(int i)
 	return a;
 }
 
+/* Non-optimized search function */
 int non_opt_search(TACC *a, TACC *fa, TFIL f, int flag)
 {
 	bool add = false;
@@ -209,13 +210,17 @@ int non_opt_search(TACC *a, TACC *fa, TFIL f, int flag)
 	return sz;
 }
 
+/* Optimized version */
 int opt_search(TACC * __restrict a, TACC * __restrict fa, TFIL f, int flag)
 {
 	int sz = 0;
 
+	// If flag != 0 it means that we need to search stuff
 	if (flag) {
-		TACC *p = a;
+		TACC *p = a;	// faster than 'a[i].'
 		for (int i = 0; i < NCLIENTS; ++i, ++p) {
+			// Squeeze all ifs into one and divide them by || operator
+			// Put the least likely conditions into the left operand 
 			if ((p->cash <= f.cash_to && p->cash >= f.cash_from) ||
 				(p->id <= f.id_to && p->id >= f.id_from) ||
 				(p->age <= f.age_to && p->age >= f.age_from) ||
@@ -228,6 +233,7 @@ int opt_search(TACC * __restrict a, TACC * __restrict fa, TFIL f, int flag)
 	return sz;
 }
 
+/* Dump stuff */
 void dump(TACC * __restrict a, int sz)
 {
 	std::cout << "========================" << std::endl;
@@ -244,6 +250,7 @@ void dump(TACC * __restrict a, int sz)
 
 }
 
+/* Console handling functions */
 void gotoxy(int x, int y)
 {
 	HANDLE hConsole;
