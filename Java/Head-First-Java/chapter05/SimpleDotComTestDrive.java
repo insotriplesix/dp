@@ -2,15 +2,8 @@
 public class SimpleDotComTestDrive {
 	
 	public static void main(String[] args) {
-		
-		float f = 3.14f;
-		int x = (int) f;
-		System.out.println(f + " " + x);
-		
 		int numOfGuesses = 0;
-		
 		GameHelper helper = new GameHelper();
-
 		SimpleDotCom dot = new SimpleDotCom();
 
 		int r = (int) (Math.random() * 5);
