@@ -1,4 +1,5 @@
 EXEC=main
+EXECDL=main_dl
 CC=gcc
 CFLAGS=-g -Wall -lm
 
@@ -41,7 +42,7 @@ $(PLUGINS): $(PLUGINSDIR)/c_%.o : $(SOURCEDIR)/c_%.c
 $(EXEC):
 	$(CC) $(CFLAGS) $(EXEC).c -L $(BUILDDIR)/ -l$(STATIC) -o $(EXEC)_static.out
 	$(CC) $(CFLAGS) $(EXEC).c -L $(BUILDDIR)/ -l$(DYNAMIC) -o $(EXEC)_dynamic.out
-#	$(CC) $(CFLAGS) $(EXEC).c -ldl -o $(EXEC)_plugins.out
+	$(CC) $(CFLAGS) $(EXECDL).c -ldl -o $(EXECDL).out
 
 clean:
 	rm -f *.out
