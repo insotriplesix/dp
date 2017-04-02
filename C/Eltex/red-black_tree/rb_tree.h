@@ -1,15 +1,18 @@
 #ifndef RB_TREE_H
 #define RB_TREE_H
 
+#define RED 0
+#define BLACK 1
+
 /* Red-black tree node entity */
-typedef struct {
-	enum { red, black } color;
+struct t_rb_node {
+	int color;
 	int key;
 
 	struct t_rb_node *parent;
 	struct t_rb_node *left;
 	struct t_rb_node *right;
-} t_rb_node;
+};
 
 /* Node creation */
 struct t_rb_node *create(struct t_rb_node *p, int k);
