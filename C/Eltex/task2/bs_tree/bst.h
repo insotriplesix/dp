@@ -1,3 +1,6 @@
+#ifndef BST_H
+#define BST_H
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -33,3 +36,5 @@ void bst_insert(struct t_bst_node *root, int k, char *v);
 
 /* Deletion func */
 struct t_bst_node *bst_delete(struct t_bst_node *root, int k);
+
+#endif
