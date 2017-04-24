@@ -8,7 +8,7 @@ Coming soon..
 
 #### ver. 1.0
 
-* Implemented basic stuff (menu bar, editor window, etc.).
+* Implemented basic stuff (menu bar, editor field, etc.).
 * Add and easter egg.
 
 ### --- Refs --------------------------
