@@ -60,40 +60,39 @@ int main(int argc, char **argv)
 	// F8 - Quit program
 	while ((ch = getch()) != KEY_F(8)) {
 		switch (ch) {
-			case KEY_ENTER:
-				insch('\n');
-//				insertln();
-//				++curr_y, curr_x = 2;
-//				move(curr_y, curr_x);
-				break;
-			case KEY_F(5):
-				break;
-			case KEY_F(6):
-				break;
-			case KEY_F(7):
-				// Set secret attrs
-				attron(COLOR_PAIR(4));
+		case KEY_ENTER:
+			insch('\n');
+//			insertln();
+//			++curr_y, curr_x = 2;
+//			move(curr_y, curr_x);
+			break;
+		case KEY_F(5):
+			break;
+		case KEY_F(6):
+			break;
+		case KEY_F(7):
+			// Set secret attrs
+			attron(COLOR_PAIR(4));
 
-				// Make some NOISE
-				for (i = 0; i < height; ++i) {
-					for (j = 0; j < width; ++j) {
-						if (secret_x < 0 || secret_x >= width)
-							secret_d *= -1;
+			// Make some NOISE
+			for (i = 0; i < height; ++i) {
+				for (j = 0; j < width; ++j) {
+					if (secret_x < 0 || secret_x >= width)
+						secret_d *= -1;
 
-						secret_x += secret_d * 2;
+					secret_x += secret_d * 2;
 
-						secret_c = 33 + rand() % 93;
-						secret_c |= A_BLINK;
-						mvaddch(secret_y, secret_x, secret_c);
+					secret_c = 33 + rand() % 93;
+					secret_c |= A_BLINK;
+					mvaddch(secret_y, secret_x, secret_c);
 
-						usleep(1337);
+					usleep(1337);
 
-						refresh();
-						doupdate();
-					}
-
-					--secret_y;
+					refresh();
+					doupdate();
 				}
+				--secret_y;
+			}
 		}
 
 		refresh();
@@ -110,6 +109,8 @@ int main(int argc, char **argv)
 
 	return 0;
 }
+
+/**** THIS MUST RUN OFF TO ANOTHER FILE FOR SURE ****/
 
 /* Init curses library */
 void init_curses()
@@ -217,4 +218,3 @@ void print_windows(WINDOW **win, int n, int h, int w)
 		x += 12;
 	}*/
 }
-
