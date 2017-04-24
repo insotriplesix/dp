@@ -12,8 +12,8 @@ To compile the program use `make` command.
 
 #### v0.8b
 
-* Implemented basic stuff (menu bar, editor field, etc.).
-* Add and easter egg.
+* Implemented basic stuff (menu bar, editor field, etc.)
+* Add and easter egg :trollface:
 
 ### --- Refs --------------------------
 
