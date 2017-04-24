@@ -49,4 +49,4 @@ same number of black nodes.
 
 ### --- Refs --------------------------
 
-[CLRS](http://ce.bonabu.ac.ir/uploads/30/CMS/user/file/115/EBook/Introduction.to.Algorithms.3rd.Edition.Sep.2010.pdf)
+[CLRS](http://www.realtechsupport.org/UB/SR/algorithms/Cormen_Algorithms_3rd.pdf)
