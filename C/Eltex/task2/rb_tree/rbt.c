@@ -14,19 +14,20 @@ struct t_rbt_node {
 	struct t_rbt_node *right;
 };
 
+/* Nil node */
+struct t_rbt_node nil_node = { BLACK, 0, NULL, NULL, NULL };
+struct t_rbt_node *nil = &nil_node;
+
 /* Node creation */
 struct t_rbt_node *rbt_create(struct t_rbt_node *p, int k)
 {
 	struct t_rbt_node *node =
 		(struct t_rbt_node *)malloc(sizeof(struct t_rbt_node));
 
-	// If p = null then this node will be a root, root always black
-	if (p) node->color = RED;
-	else node->color = BLACK;
-
+	node->color = RED;
 	node->key = k;
 	node->parent = p;
-	node->left = node->right = NULL;
+	node->left = node->right = nil;
 
 	return node;
 }
@@ -34,11 +35,15 @@ struct t_rbt_node *rbt_create(struct t_rbt_node *p, int k)
 /* Destroy the tree */
 void rbt_destroy(struct t_rbt_node *node)
 {
-	if (node) {
+	if (node == nil) return;
+
+	if (node->left != nil)
 		rbt_destroy(node->left);
-		free(node);
+
+	if (node->right != nil)
 		rbt_destroy(node->right);
-	}
+
+	free(node);
 }
 
 /* Print tree */
@@ -46,7 +51,7 @@ void rbt_print(struct t_rbt_node *tree, int padding)
 {
 	int i;
 
-	if (!tree) {
+	if (tree == nil) {
 		for (i = 0; i < padding; i++) putchar('\t');
 		puts("\033[1;30mnil\033[0m");
 	} else {
@@ -65,7 +70,7 @@ void rbt_print(struct t_rbt_node *tree, int padding)
 /* Search func */
 struct t_rbt_node *rbt_search(struct t_rbt_node *node, int k)
 {
-	while (node && k != node->key) {
+	while (node && node != nil && k != node->key) {
 		if (k < node->key)
 			node = node->left;
 		else
@@ -93,8 +98,25 @@ struct t_rbt_node *rbt_max(struct t_rbt_node *node)
 	return node;
 }
 
+/* Transplant the node */
+struct t_rbt_node *rbt_transplant(struct t_rbt_node *root,
+	struct t_rbt_node *n1, struct t_rbt_node *n2)
+{
+	if (n1->parent == nil)
+		root = n2;
+	else if (n1 == n1->parent->left)
+		n1->parent->left = n2;
+	else
+		n1->parent->right = n2;
+
+	n2->parent = n1->parent;
+
+	return root;
+}
+
 /* Tree left rotation */
-struct t_rbt_node *rbt_left_rotate(struct t_rbt_node *root, struct t_rbt_node *p)
+struct t_rbt_node *rbt_left_rotate(struct t_rbt_node *root,
+	struct t_rbt_node *p)
 {
 	// Set child node
 	struct t_rbt_node *c = p->right;
@@ -103,31 +125,35 @@ struct t_rbt_node *rbt_left_rotate(struct t_rbt_node *root, struct t_rbt_node *p
 	p->right = c->left;
 
 	// Bridge the child's left sublink
-	if (c->left)
+	if (c->left != nil)
 		c->left->parent = p;
 
 	// Link p's parent to the child
-	c->parent = p->parent;
+	if (c != nil)
+		c->parent = p->parent;
 
-	if (!p->parent)
+	if (p->parent != nil) {
+		// Bridge p's old parent's left/right child
+		if (p == p->parent->left)
+			p->parent->left = c;
+		else
+			p->parent->right = c;
+	} else
 		root = c;
-	// Bridge p's old parent's left/right child
-	else if (p->key == p->parent->left->key)
-		p->parent->left = c;
-	else
-		p->parent->right = c;
 
 	// Put p on child's left
 	c->left = p;
 
 	// Now p's parent is c
-	p->parent = c;
+	if (p != nil)
+		p->parent = c;
 
 	return root;
 }
 
 /* Tree right rotation */
-struct t_rbt_node *rbt_right_rotate(struct t_rbt_node *root, struct t_rbt_node *p)
+struct t_rbt_node *rbt_right_rotate(struct t_rbt_node *root,
+	struct t_rbt_node *p)
 {
 	// Set child node
 	struct t_rbt_node *c = p->left;
@@ -136,40 +162,45 @@ struct t_rbt_node *rbt_right_rotate(struct t_rbt_node *root, struct t_rbt_node *
 	p->left = c->right;
 
 	// Bridge the child's right sublink
-	if (c->right)
+	if (c->right != nil)
 		c->right->parent = p;
 
 	// Link p's parent to the child
-	c->parent = p->parent;
+	if (c != nil)
+		c->parent = p->parent;
 
-	if (!p->parent)
+	if (p->parent != nil) {
+		// Bridge p's old parent's left/right child
+		if (p == p->parent->left)
+			p->parent->left = c;
+		else
+			p->parent->right = c;
+	} else
 		root = c;
-	// Bridge p's old parent's left/right child
-	else if (p->key == p->parent->left->key)
-		p->parent->left = c;
-	else
-		p->parent->right = c;
 
 	// Put p on child's right
 	c->right = p;
 
 	// Now p's parent is c
-	p->parent = c;
+	if (p != nil)
+		p->parent = c;
 
 	return root;
 }
 
 /* Insertion fixup */
-struct t_rbt_node *rbt_insert_fixup(struct t_rbt_node *root, struct t_rbt_node *n)
+struct t_rbt_node *rbt_insert_fixup(struct t_rbt_node *root,
+	struct t_rbt_node *n)
 {
+	// Uncle node
 	struct t_rbt_node *u;
 
 	// Current node is red
-	while (n->parent->color == RED) {
-		// If true then the node is in the left side of the grandparent
+	while (n != root && n->parent->color == RED) {
+		// If true then the node is in the left side of the grandpa
 		if (n->parent == n->parent->parent->left) {
 			// Set the uncle node
-			u = n->parent->parent->right;	// >>>>>> ERROR IS HERE
+			u = n->parent->parent->right;
 
 			// Case 1: Uncle is red
 			if (u->color == RED) {
@@ -179,19 +210,21 @@ struct t_rbt_node *rbt_insert_fixup(struct t_rbt_node *root, struct t_rbt_node *
 				n = n->parent->parent;
 			}
 			// Case 2: Uncle is black (wusup nigga)
-			else if (n == n->parent->right) {
-				n = n->parent;
-				root = rbt_left_rotate(root, n);
+			else {
+				if (n == n->parent->right) {
+					n = n->parent;
+					root = rbt_left_rotate(root, n);
+				}
+				// Case 3: Uncle is black
+				n->parent->color = BLACK;
+				n->parent->parent->color = RED;
+				root = rbt_right_rotate(root, n->parent->parent);
 			}
-			// Case 3: Uncle is black
-			n->parent->color = BLACK;
-			n->parent->parent->color = RED;
-			root = rbt_right_rotate(root, n->parent->parent);
 		}
 		// Otherwise - the node is on the right
 		else {
 			// Set the uncle node
-			u = n->parent->parent->left;	// >>>>>> ERROR IS HERE
+			u = n->parent->parent->left;
 
 			// Case 4: Uncle is red
 			if (u->color == RED) {
@@ -201,14 +234,16 @@ struct t_rbt_node *rbt_insert_fixup(struct t_rbt_node *root, struct t_rbt_node *
 				n = n->parent->parent;
 			}
 			// Case 5: Uncle is black
-			else if (n == n->parent->left) {
-				n = n->parent;
-				root = rbt_right_rotate(root, n);
+			else {
+				if (n == n->parent->left) {
+					n = n->parent;
+					root = rbt_right_rotate(root, n);
+				}
+				// Case 6: Uncle is black
+				n->parent->color = BLACK;
+				n->parent->parent->color = RED;
+				root = rbt_left_rotate(root, n->parent->parent);
 			}
-			// Case 6: Uncle is black
-			n->parent->color = BLACK;
-			n->parent->parent->color = RED;
-			root = rbt_left_rotate(root, n->parent->parent);
 		}
 	}
 
@@ -221,13 +256,10 @@ struct t_rbt_node *rbt_insert_fixup(struct t_rbt_node *root, struct t_rbt_node *
 /* Insertion func */
 struct t_rbt_node *rbt_insert(struct t_rbt_node *root, int k)
 {
-	struct t_rbt_node *parent, *node = root;
+	struct t_rbt_node *parent = nil, *node = root;
 
-	// New node is the root
-	if (!root)
-		return rbt_create(root, k);
-
-	while (node) {
+	// Get down the tree
+	while (node && node != nil) {
 		// Next node is a parent node
 		parent = node;
 
@@ -245,15 +277,159 @@ struct t_rbt_node *rbt_insert(struct t_rbt_node *root, int k)
 	node = rbt_create(parent, k);
 
 	// Create the link between parent and his new child
-	if (parent) {
+	if (parent && parent != nil) {
 		if (k < parent->key)
 			parent->left = node;
 		else
 			parent->right = node;
+	} else
+		root = node;
+
+	// Fix properties
+	return rbt_insert_fixup(root, node);
+}
+
+/* Deletion fixup */
+struct t_rbt_node *rbt_delete_fixup(struct t_rbt_node *root,
+	struct t_rbt_node *node)
+{
+	// Sibling node
+	struct t_rbt_node *w;
+
+	// Current node is black
+	while ((node != root) && (node->color == BLACK)) {
+		// The node is on the left
+		if (node == node->parent->left) {
+
+			// Set the sibling node
+			w = node->parent->right;
+
+			// Case 1: Sibling is red
+			if (w->color == RED) {
+				w->color = BLACK;
+				node->parent->color = RED;
+				root = rbt_left_rotate(root, node->parent);
+				w = node->parent->right;
+			}
+
+			// Case 2: Sibling is black, and both of w's children are black
+			if (w->left->color == BLACK && w->right->color == BLACK) {
+				w->color = RED;
+				node = node->parent;
+			}
+			// Case 3: Sibling is black, left child is red, right - black
+			else if (w->right->color == BLACK) {
+				w->left->color = BLACK;
+				w->color = RED;
+				root = rbt_right_rotate(root, w);
+				w = node->parent->right;
+			}
+
+			// Case 4: Sibling is black and its right child is red
+			w->color = node->parent->color;
+			node->parent->color = BLACK;
+			w->right->color = BLACK;
+			root = rbt_left_rotate(root, node->parent);
+			node = root;
+		}
+		// Otherwise - the node is on the right
+		else {
+			// Set the sibling node
+			w = node->parent->left;
+
+			// Case 1: Sibling is red
+			if (w->color == RED) {
+				w->color = BLACK;
+				node->parent->color = RED;
+				root = rbt_right_rotate(root, node->parent);
+				w = node->parent->left;
+			}
+
+			// Case 2: Sibling is black, and both of w's children are black
+			if (w->left->color == BLACK && w->right->color == BLACK) {
+				w->color = RED;
+				node = node->parent;
+			}
+			// Case 3: Sibling is black, right child is red, left - black
+			else if (w->left->color == BLACK) {
+				w->right->color = BLACK;
+				w->color = RED;
+				root = rbt_left_rotate(root, w);
+				w = node->parent->left;
+			}
+
+			// Case 4: Sibling is black and its left child is red
+			w->color = node->parent->color;
+			node->parent->color = BLACK;
+			w->left->color = BLACK;
+			root = rbt_right_rotate(root, node->parent);
+			node = root;
+		}
+
+		// Color the node as black
+		node->color = BLACK;
 	}
 
-//	return rbt_insert_fixup(root, node);
 	return root;
 }
 
 /* Deletion func */
+struct t_rbt_node *rbt_delete(struct t_rbt_node *root, int k)
+{
+	struct t_rbt_node *y, *x;
+	struct t_rbt_node *node = rbt_search(root, k);
+
+	// Tree is empty or node is not in the tree
+	if ((root == nil) || (node == nil))
+		return NULL;
+
+	// Set y as the ptr to the node which we want to remove
+	y = node;
+
+	// Save the original color of that node
+	int y_orig_color = y->color;
+
+	// If node has only one child the we just transplant the node
+	// with its child x
+	if (node->left == nil) {
+		x = node->right;
+		root = rbt_transplant(root, node, node->right);
+	} else if (node->right == nil) {
+		x = node->left;
+		root = rbt_transplant(root, node, node->left);
+	}
+	// Otherwise, node has two children
+	else {
+		// Set y to node's successor
+		y = rbt_min(node->right);
+
+		// The color of y now might changed, save that
+		y_orig_color = y->color;
+
+		// x is the child of y
+		x = y->right;
+
+		// Store the original position of node
+		if (y->parent == node)
+			x->parent = y;
+		else {
+printf("succ1\n");
+			root = rbt_transplant(root, y, y->right);
+			y->right = node->right;
+			y->right->parent = y;
+		}
+printf("succ2\n");
+		// Transplant the node
+		root = rbt_transplant(root, node, y);
+		y->left = node->left;
+		y->left->parent = y;
+		y->color = node->color;
+	}
+
+	// If original color of the node that we removed was black,
+	// then it could cause violations of the properties
+	if (y_orig_color == BLACK)
+		root = rbt_delete_fixup(root, x);
+
+	return node;
+}

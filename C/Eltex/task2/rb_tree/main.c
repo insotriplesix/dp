@@ -15,7 +15,6 @@ int main(int argc, char **argv)
 	for (i = 0; i < 5; i++) {
 		int r = 11 + rand() % 88;
 		tree = rbt_insert(tree, r);
-		rbt_print(tree, 3);
 		printf("Node with key %d added\n", r);
 	}
 
@@ -23,14 +22,18 @@ int main(int argc, char **argv)
 	rbt_print(tree, 3);
 
 	int k;
-	printf("Let's search something! Input value: ");
+	printf("Let's delete something! Input value: ");
 	scanf("%d", &k);
 
-	// Search some stuff
-	if ((node = rbt_search(tree, k)))
-		printf("The node (%2d) exists in the tree.\n", node->key);
+	// Delete some stuff
+	if ((node = rbt_delete(tree, k)))
+		printf("The node (%2d) was removed from the tree.\n",
+			node->key);
 	else
 		printf("The node (%2d) doesn't exist in the tree!\n", k);
+
+	// Print the tree
+	rbt_print(tree, 3);
 
 	// Destroy the tree :(
 	rbt_destroy(tree);
