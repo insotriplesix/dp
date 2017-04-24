@@ -31,21 +31,23 @@ same number of black nodes.
 
 `rbt_search()` - Search the node by a key.
 
-`rbt_min()` - Returns the node with minimum key.
+`rbt_min()` - Returns the node with a minimum key.
 
-`rbt_max()` - Returns the node with maximum key.
+`rbt_max()` - Returns the node with a maximum key.
+
+`rbt_transplant()` - Transplant the node to another place.
 
 `rbt_left_rotate()` - Left rotation.
 
 `rbt_right_rotate()` - Right rotation.
 
-`rbt_fixup_insert()` - Restores the Red-Black properties.
+`rbt_insert_fixup()` - Restores the Red-Black properties after insertion.
 
 `rbt_insert()` - Insert the node into the tree.
 
-`rbt_delete_fixup()` - in process ...
+`rbt_delete_fixup()` - Restores the Red-Black properties after deletion.
 
-`rbt_delete()` - in process ...
+`rbt_delete()` - Delete the node from the tree.
 
 ### --- Refs --------------------------
 
