@@ -52,3 +52,4 @@ same number of black nodes.
 ### --- Refs --------------------------
 
 [CLRS](http://www.realtechsupport.org/UB/SR/algorithms/Cormen_Algorithms_3rd.pdf)
+[mkurnosov](http://www.mkurnosov.net/teaching/uploads/DSA/dsa-fall2015-lec2.pdf)
