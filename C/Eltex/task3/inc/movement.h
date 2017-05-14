@@ -2,9 +2,6 @@
 #define MOVEMENT_H
 
 #include <panel.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
 
 void move_left(WINDOW *win, int *y, int *x, int b);
 void move_right(WINDOW *win, int *y, int *x, int b);
