@@ -1,7 +1,7 @@
 EXEC=main
 EXECDL=main_dl
 CC=gcc
-CFLAGS=-g -Wall -lm
+CFLAGS=-std=gnu99 -Wall -g -lm
 
 LD=LD_LIBRARY_PATH
 LIBNAME=complex
