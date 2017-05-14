@@ -10,14 +10,18 @@ To compile the program use `make` command.
 
 ### --- Func --------------------------
 
-#### v0.9b
+#### v0.8b
+
+* Upload/save text from/to the file
+* Cosmetic changes
+
+#### v0.7b
 
 * Better view
-* Added the possibility to upload a file and output it's content on the textfield
 * Added the movement stuff
 * Added the character deletion
 
-#### v0.8b
+#### v0.6b
 
 * Implemented basic stuff (menu bar, editor field, etc.)
 * Added an easter egg :trollface:
