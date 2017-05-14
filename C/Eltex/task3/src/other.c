@@ -1,4 +1,4 @@
-#include "init.h"
+#include "other.h"
 
 /* Upload content from the file */
 void load_file(char *fname, char *buf, int *sz)
