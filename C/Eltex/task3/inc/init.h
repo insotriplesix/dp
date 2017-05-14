@@ -2,9 +2,7 @@
 #define INIT_H
 
 #include <panel.h>
-#include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
 
 #define NPANELS 3
 #define NWINS 3
