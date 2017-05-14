@@ -83,7 +83,7 @@ struct t_rbt_node *rbt_search(struct t_rbt_node *node, int k)
 /* Find min key in the tree */
 struct t_rbt_node *rbt_min(struct t_rbt_node *node)
 {
-	while (node && node->left)
+	while (node != nil && node->left != nil)
 		node = node->left;
 
 	return node;
@@ -92,7 +92,7 @@ struct t_rbt_node *rbt_min(struct t_rbt_node *node)
 /* Find min key in the tree */
 struct t_rbt_node *rbt_max(struct t_rbt_node *node)
 {
-	while (node && node->right)
+	while (node != nil && node->right != nil)
 		node = node->right;
 
 	return node;
