@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-Wall -g
+CFLAGS=-std=gnu99 -Wall -g -pedantic
 PROG=main
 SRC=main.c bst.c
 
