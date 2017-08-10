@@ -1,8 +1,8 @@
-﻿using System;
+using System;
 
-namespace Tasks
+namespace Percentages
 {
-    class Program
+    class PercentagesTask
     {
         public static void Main()
         {
@@ -13,6 +13,7 @@ namespace Tasks
         public static double Calculate(string userInput)
         {
             string[] values = userInput.Split(' ');
+            
             var sum = double.Parse(values[0]);
             var rank = double.Parse(values[1]);
             var deposit = double.Parse(values[2]);
