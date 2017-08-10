@@ -13,7 +13,7 @@ namespace Task1
             Console.Write("Input y: ");
             var y = int.Parse(Console.ReadLine());
 
-            int counter = 0;
+            var counter = 0;
             for (int i = 1; i < n; ++i)
             {
                 if (i % x == 0 && i % y == 0)
