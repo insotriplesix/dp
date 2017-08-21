@@ -2,24 +2,24 @@ namespace Mazes
 {
     public static class EmptyMazeTask
     {
-        // Go to the farthest right side
-        public static void GoToRightSide(Robot robot, int width, int height)
+        // Horizontal shift
+        public static void MakeHorizontalMove(Robot robot, int width, Direction dir)
         {
             for (int i = 0; i < width - 3; ++i)
-                robot.MoveTo(Direction.Right);
+                robot.MoveTo(dir);
         }
 
-        // Go to the farthest bottom side
-        public static void GoToDownSide(Robot robot, int width, int height)
+        // Vertical shift
+        public static void MakeVerticalMove(Robot robot, int height, Direction dir)
         {
             for (int i = 0; i < height - 3; ++i)
-                robot.MoveTo(Direction.Down);
+                robot.MoveTo(dir);
         }
 
         public static void MoveOut(Robot robot, int width, int height)
         {
-            GoToRightSide(robot, width, height);
-            GoToDownSide(robot, width, height);
+            MakeHorizontalMove(robot, width, Direction.Right);
+            MakeVerticalMove(robot, height, Direction.Down);
         }
     }
 }
