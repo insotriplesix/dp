@@ -1,7 +1,7 @@
 namespace Mazes
 {
-	public static class PyramidMazeTask
-	{
+    public static class PyramidMazeTask
+    {
         // Horizontal shift
         public static void MakeHorizontalMove(Robot robot, int width, Direction dir)
         {
