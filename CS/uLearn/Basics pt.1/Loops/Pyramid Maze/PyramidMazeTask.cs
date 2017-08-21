@@ -1,28 +1,28 @@
 namespace Mazes
 {
-    public static class PyramidMazeTask
-    {
-        // Go to the farthest right side
-        public static void GoToRightSide(Robot robot, int width, int height)
+	public static class PyramidMazeTask
+	{
+        // Horizontal shift
+        public static void MakeHorizontalMove(Robot robot, int width, Direction dir)
         {
             for (int i = 0; i < width - 3; ++i)
-                robot.MoveTo(Direction.Right);
+                robot.MoveTo(dir);
         }
 
-        // Go to the farthest left side
-        public static void GoToLeftSide(Robot robot, int width, int height)
+        // Vertical shift
+        public static void MakeVerticalMove(Robot robot, int height, Direction dir)
         {
-            for (int i = 0; i < width - 3; ++i)
-                robot.MoveTo(Direction.Left);
+            for (int i = 0; i < height - 3; ++i)
+                robot.MoveTo(dir);
         }
 
         // Make a "snake curve"
         public static void MakeCurve(Robot robot, int width, int height)
         {
-            GoToRightSide(robot, width, height);
+            MakeHorizontalMove(robot, width, Direction.Right);
             robot.MoveTo(Direction.Up);
             robot.MoveTo(Direction.Up);
-            GoToLeftSide(robot, width - 2, height);
+            MakeHorizontalMove(robot, width - 2, Direction.Left);
         }
 
         public static void MoveOut(Robot robot, int width, int height)
