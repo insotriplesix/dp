@@ -19,7 +19,7 @@ int main(void)
 
     struct test *ptr1 = (struct test *) str;
 
-    printf("\nNon-packed version of the struct (size: %lu)\n",
+    printf("\nNon-packed version of the struct (size: %lu)\n\n",
         sizeof(struct test));
 
     for (int i = 0; i != 2; i++, ptr1++) {
@@ -29,7 +29,7 @@ int main(void)
 
     struct test_p *ptr2 = (struct test_p *) str;
 
-    printf("\nPacked version of the struct (size: %lu)\n",
+    printf("\nPacked version of the struct (size: %lu)\n\n",
         sizeof(struct test_p));
 
     for (int i = 0; i != 2; i++, ptr2++) {
