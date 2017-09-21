@@ -12,18 +12,17 @@ int main(void)
     int *p1 = &v1;
     int *p2 = &v2;
 
-    printf("\nBefore swapping pointers:\n\n");
-
+    printf("\nInitial state:\n\n");
     print_result(v1, v2, p1, p2);
+
     swap_pointers(&p1, &p2);
 
     printf("\nAfter swapping pointers:\n\n");
-
     print_result(v1, v2, p1, p2);
+
     swap_values(p1, p2);
 
     printf("\nAfter swapping values:\n\n");
-
     print_result(v1, v2, p1, p2);
 
     printf("\n");
