@@ -122,7 +122,7 @@ void help_popup(int h, int w)
     curs_set(0);
 
     wmove(win, line++, win_width / 4);
-    waddstr(win, "5aboteditor v1.0");
+    waddstr(win, "5aboteditor v0.9b");
     wmove(win, line++, 1);
     waddstr(win, "");
     wmove(win, line++, 1);
