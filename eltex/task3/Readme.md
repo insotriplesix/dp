@@ -4,9 +4,7 @@
 
 **Curses** is a terminal control library for Unix-like systems, enabling the construction of text user interface (TUI) applications.
 
-To install the library use `sudo apt-get install libncurses-dev`.
-
-To compile the program use `make` command.
+5aboteditor (the name can be changed in the future) is the simple text editor with extra functionality.
 
 ### --- Func --------------------------
 
@@ -19,6 +17,10 @@ To compile the program use `make` command.
 ##### There are at least 2 bugs need to be fixed asap:
 1. The `~Z` symbol which appears everytime you run the program
 2. The editor field box which don`t want to draw correctly for some reason 
+
+<p>
+    <img src="https://github.com/5aboteur/dp/eltex/task3/res/editor.png" />
+</p>
 
 #### v0.8b
 
