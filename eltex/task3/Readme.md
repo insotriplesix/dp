@@ -19,7 +19,7 @@
 2. The editor field box which don`t want to draw correctly for some reason 
 
 <p>
-    <img src="https://github.com/5aboteur/dp/eltex/task3/res/editor.png" />
+    <img src="https://github.com/5aboteur/dp/blob/master/eltex/task3/res/editor.png" />
 </p>
 
 #### v0.8b
