@@ -6,9 +6,16 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-void load_file(char *fname, char *buf, int *sz);
-void save_file(char *fname, char *buf, int sz);
+#define FNAME_MAX_SIZE 128
 
-void secret_func(WINDOW *win, int h, int w);
+void change_theme(WINDOW *win, int h, int w);
+void get_help(int h, int w);
+void open_file(char *buf, int *sz, int h, int w);
+void save_file(char *buf, int sz, int h, int w);
+
+char change_theme_popup(int h, int w);
+void help_popup(int h, int w);
+char *open_file_popup(int h, int w);
+char *save_file_popup(int h, int w);
 
 #endif

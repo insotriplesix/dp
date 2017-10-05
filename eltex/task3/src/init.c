@@ -10,13 +10,10 @@ void init_curses()
 	clear();
 
 	// Disable line buffering
-	raw();	// or cbreak() ?
+	cbreak();	// or raw() ?
 
 	// Switch off echoing
 	noecho();
-
-	// Enable func keys, arrows etc.
-	keypad(stdscr, TRUE);
 }
 
 /* Init palette */
@@ -28,82 +25,69 @@ void init_colors()
 		printf("This terminal doesn't support colouring.\n");
 		exit(1);
 	}
-/*
-	// Check color changing support
-	if (!can_change_color()) {
-		endwin();
-		printf("This terminal doesn't support color changing.\n");
-	}
-*/
+
 	// Start color functionality
 	start_color();
 
 	// Pair id, Foreground, Background
-	init_pair(1, COLOR_WHITE, COLOR_BLUE);		// edit field
-	init_pair(2, COLOR_BLACK, COLOR_YELLOW);	// tab & aux
-	init_pair(3, COLOR_YELLOW, COLOR_YELLOW);	// secret
-	init_pair(4, COLOR_BLACK, COLOR_RED);		// something else
+	init_pair(1, COLOR_BLACK, COLOR_YELLOW);	// menu components
+	init_pair(2, COLOR_WHITE, COLOR_BLUE);		// edit field
+	init_pair(3, COLOR_YELLOW, COLOR_BLACK);	// reversed main
+	init_pair(4, COLOR_WHITE, COLOR_BLACK);		// borders
 }
 
 /* Init default windows */
 void init_windows(WINDOW **win, int n, int h, int w)
 {
-	// Editor field
-	win[0] = create_window(h - 9, w - 3, 4, 2);
+    char *fname = " untitled ";
 
-	// Turn off previous atrributes and set bg color
-	wbkgdset(win[0], COLOR_PAIR(0));	// mustbe 1
+    // 0 -- Menu bar
+    win[0] = newpad(3, w);
+    wbkgd(win[0], COLOR_PAIR(4));
+    box(win[0], ACS_VLINE, ACS_HLINE);
+    wmove(win[0], 1, 1);
 
-	// Options field
-	win[1] = create_window(3, w - 3, 1, 2);
+    wattron(win[0], COLOR_PAIR(1));
 
-	// Set options attrs
-	wattron(win[1], COLOR_PAIR(2));
+    mvwprintw(win[0], 1, 2, "  F4 - Open  ");
+    mvwprintw(win[0], 1, 17, "  F5 - Save  ");
+    mvwprintw(win[0], 1, 32, "  F6 - Extra  ");
+    mvwprintw(win[0], 1, 48, "  F7 - Help  ");
+    mvwprintw(win[0], 1, 63, "  F8 - Exit  ");
+    mvwprintw(win[0], 1, w - 20, " made by 5aboteur ");
 
-	// Place the option buttons
-	mvwprintw(win[1], 1, 3, " F5 - Open ");
-	mvwprintw(win[1], 1, 15, " F6 - Save ");
-	mvwprintw(win[1], 1, 27, " F8 - Quit ");
-	mvwprintw(win[1], 1, 39, "    - Secret key ");
-	mvwprintw(win[1], 1, w - 24, " made by 5aboteur ");
+    prefresh(win[0], 0, 0, 0, 0, 2, w);
 
-	// Set secret attrs
-	wattron(win[1], COLOR_PAIR(3));
+    // 1 -- Editing area box
+    win[1] = newpad(h - 6, w);
+    wbkgd(win[1], COLOR_PAIR(4));
+    box(win[1], ACS_VLINE, ACS_HLINE);
+    mvwaddstr(win[1], 0, w / 2 - strlen(fname) / 2, fname);
+    prefresh(win[1], 0, 0, 3, 0, h - 6, w);
 
-	mvwprintw(win[1], 1, 41, "F7");
+    // 2 -- Editing area
+    win[2] = newpad(h - 8, w - 2);
+    wbkgd(win[2], COLOR_PAIR(2));
+    prefresh(win[2], 0, 0, 4, 1, h - 7, w - 1);
 
-	// Aux field
-	win[2] = create_window(5, w - 3, h - 5, 2);
-	wbkgdset(win[2], COLOR_PAIR(0));	// mustbe 2
+	// Enable func keys, arrows etc.
+	keypad(win[2], TRUE);
+
+    // 3 -- Info bar
+    win[3] = newpad(5, w);
+    wbkgd(win[3], COLOR_PAIR(1));
+    box(win[3], ACS_VLINE, ACS_HLINE);
+    wattron(win[3], COLOR_PAIR(1));
+
+    mvwprintw(win[3], 2, 4, "File: ..");
+    mvwprintw(win[3], 2, 16, "Size: ..");
+    mvwprintw(win[3], 2, 28, "Inode: ..");
+    mvwprintw(win[3], 2, 41, "Something else: ..");
+    mvwprintw(win[3], 2, w - 10, "v0.9b");
+    wattron(win[3], COLOR_PAIR(4));
+    box(win[3], 0, 0);
+    mvwprintw(win[3], 0, w / 2 - 4, "%3d :%3d ", 0, 0);
+    prefresh(win[3], 0, 0, h - 5, 0, h, w);
 }
 
-/* Init panels */
-void init_panels(PANEL **pan, WINDOW **win, int n)
-{
-	int i;
 
-	// Attach panels
-	for (i = 0; i < n; ++i)
-		pan[i] = new_panel(win[i]);
-
-	// Update the stacking order
-	update_panels();
-
-	// Display the content
-	doupdate();
-}
-
-/* Create new window */
-WINDOW *create_window(int h, int w, int y, int x)
-{
-	// Allocate memory
-	WINDOW *win = newwin(h, w, y, x);
-
-	// Draw a border around the window
-	box(win, 0, 0);
-
-	// Display the content
-	wrefresh(win);
-
-	return win;
-}

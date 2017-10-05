@@ -8,9 +8,8 @@ int main(int argc, char *argv[])
 	static int fbuf_cnt = 0;
 
 	WINDOW *windows[NWINS];
-	PANEL *panels[NPANELS];
 
-	int ch, i, j, width, height;
+	int ch, i, width, height;
 
 	// Init curses session
 	init_curses();
@@ -24,131 +23,108 @@ int main(int argc, char *argv[])
 	// Init default windows
 	init_windows(windows, NWINS, height, width);
 
-	// Attach panels to them
-	init_panels(panels, windows, NPANELS);
-
-	// Set default attributes
-//	wattron(windows[0], COLOR_PAIR(1));
-//	wattron(windows[1], COLOR_PAIR(2));
-//	wattron(windows[2], COLOR_PAIR(2));
-
-	// Update the stacking order
-	update_panels();
-
-	// Display the content
-	doupdate();
-
-	char filename[32];
-
-	fbuf = (char *)malloc(BUFSIZ * sizeof(char));
+	fbuf = (char *) malloc(BUFSIZ * sizeof(char));
 
 	// Default position of the cursor
-	int def_y = 1, def_x = 1;
+	int def_pos_x = 0, def_pos_y = 0;
 
-	// Current position of the cursor
-	int curr_y = def_y, curr_x = def_x;
+	// Current position in the edit field
+	int field_y = def_pos_y, field_x = def_pos_x;
 
 	// Set this pos in the window
-	wmove(windows[0], 1, 1);
+	wmove(windows[2], field_y, field_x);
 
-	// Display the content
-	wrefresh(windows[0]);
+    int is_exit = FALSE;
 
-	// F8 - To quit that!
-	while ((ch = getch()) != KEY_F(8)) {
+	do {
+        ch = wgetch(windows[2]);
+
 		switch (ch) {
 			case KEY_LEFT:	// left
-				move_left(windows[0], &curr_y, &curr_x, 0);
+				move_left(windows[2], &field_y, &field_x, -1);
 				break;
 			case KEY_RIGHT:	// right
-				move_right(windows[0], &curr_y, &curr_x, width - 4);
+				move_right(windows[2], &field_y, &field_x, width - 1);
 				break;
 			case KEY_UP:	// up
-				move_up(windows[0], &curr_y, &curr_x, 0);
+				move_up(windows[2], &field_y, &field_x, -1);
 				break;
 			case KEY_DOWN:	// down
-				move_down(windows[0], &curr_y, &curr_x, height - 10);
+				move_down(windows[2], &field_y, &field_x, height - 10);
 				break;
 			case KEY_DC:
 			case 127:
 			case KEY_BACKSPACE:	// remove
-				move_left(windows[0], &curr_y, &curr_x, 0);
-				waddch(windows[0], ' ');
-				wmove(windows[0], curr_y, curr_x);
+				move_left(windows[2], &field_y, &field_x, -1);
+				pechochar(windows[2], ' ');
+				wmove(windows[2], field_y, field_x);
 
-				if (fbuf_cnt && (curr_x > 1))
+				if (fbuf_cnt && (field_x > 1))
 					fbuf[fbuf_cnt--] = ' ';
 				break;
 			case '\n':
 			case KEY_ENTER:
-				waddch(windows[0], '\n');
-				curr_x = def_x;
-				wmove(windows[0], ++curr_y, curr_x);
+				pechochar(windows[2], '\n');
+				field_x = def_pos_x;
+				wmove(windows[2], ++field_y, field_x);
 				fbuf[fbuf_cnt++] = '\n';
 				break;
 			case '\t':
 				for (i = 0; i < 4; ++i) {
-					move_right(windows[0], &curr_y, &curr_x, width - 4);
-					waddch(windows[0], ' ');
-					wmove(windows[0], curr_y, curr_x);
+					move_right(windows[2], &field_y, &field_x, width - 1);
+					pechochar(windows[2], ' ');
+					wmove(windows[2], field_y, field_x);
 					fbuf[fbuf_cnt++] = ' ';
 				}
 				break;
-			case KEY_F(5):	// load
-				mvwprintw(windows[2], 1, 1, "File you want to open: ");
-				echo();
-				wgetstr(windows[2], filename);
-				noecho();
+            case 15:        // ctrl+o
+			case KEY_F(4):	// Open
+				open_file(fbuf, &fbuf_cnt, height, width);
 
-				// Load the file
-				load_file(filename, fbuf, &fbuf_cnt);
-
-				// Insert the whole buffer into the editor field
-				mvwinsstr(windows[0], def_y, def_x, fbuf);
+				// Insert whole buffer into the editor field
+				mvwinsstr(windows[2], 0, 0, fbuf);
 				break;
-			case KEY_F(6):	// Save
-				mvwprintw(windows[2], 1, 1, "File you want to store the text: ");
-				echo();
-				wgetstr(windows[2], filename);
-				noecho();
-
-				// Save to the file
-				save_file(filename, fbuf, fbuf_cnt);
+            case 11:        // ctrl+k
+			case KEY_F(5):	// Save
+				save_file(fbuf, fbuf_cnt, height, width);
 				break;
-			case KEY_F(7):
-				// Set secret attrs
-				wattron(windows[0], COLOR_PAIR(4) | A_REVERSE | A_BLINK);
-
-				// ?
-				secret_func(windows[0], height, width);
+            case 24:        // ctrl+x
+            case KEY_F(6):  // Extra
+            case 7:    // ctrl+G
+                change_theme(windows[2], height, width);
+                //extra_options();
+                break;
+            case 8:         // ctrl+h
+			case KEY_F(7):  // Help
+                get_help(height, width);
 				break;
+            case 5:         // ctrl+e
+            case KEY_F(8):  // Exit
+                is_exit = TRUE;
+                break;
 			default:
 				// Add input symbol to the buffer
 				fbuf[fbuf_cnt++] = (char)ch;
 
 				// Display it on the edit field
-				if (curr_x + 1 < width - 4) {
-					waddch(windows[0], ch);
-					move_right(windows[0], &curr_y, &curr_x, width);
+				if (field_x + 1 < width - 1) {
+					pechochar(windows[2], ch);
+					move_right(windows[2], &field_y, &field_x, width);
 				} else {
-					++curr_y;
-					curr_x = def_x - 1;
-					waddch(windows[0], ch);
-					move_right(windows[0], &curr_y, &curr_x, width);
+					++field_y;
+					field_x = def_pos_x;
+                    wmove(windows[2], field_y, field_x);
+					pechochar(windows[2], ch);
+					move_right(windows[2], &field_y, &field_x, width);
 				}
 		}
 
 		// Dump the changed content on the screen
-		wrefresh(windows[0]);
-	}
+        mvwprintw(windows[3], 0, width / 2 - 4, "%3d :%3d ", field_y + 1, field_x + 1);
+        prefresh(windows[3], 0, 0, height - 5, 0, height, width);
 
-	// Deallocate memory for panels
-	for (i = 0; i < NPANELS; ++i)
-		del_panel(panels[i]);
-
-	// Deallocate memory for windows
-	for (j = 0; j < NWINS; ++j)
-		delwin(windows[j]);
+        prefresh(windows[2], 0, 0, 4, 1, height - 7, width - 1);
+	} while (is_exit == FALSE);
 
 	// Free text buffer
 	free(fbuf);
