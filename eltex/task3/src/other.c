@@ -18,7 +18,7 @@ void change_theme(WINDOW **win, int h, int w)
 			fg_field = COLOR_GREEN, bg_field = COLOR_BLACK;
 			fg_popup = COLOR_GREEN, bg_popup = COLOR_BLACK;
 			break;
-		case '2': // sexy
+		case '2': // icy
 			fg_menu = COLOR_CYAN, bg_menu = COLOR_BLACK;
 			fg_field = COLOR_MAGENTA, bg_field = COLOR_WHITE;
 			fg_popup = COLOR_CYAN, bg_popup = COLOR_BLACK;
@@ -110,7 +110,7 @@ char change_theme_popup(int h, int w)
 	wmove(win, line++, 1);
 	waddstr(win, " [1] leet ");
 	wmove(win, line++, 1);
-	waddstr(win, " [2] sexy ");
+	waddstr(win, " [2] icy  ");
 	wmove(win, line++, 1);
 	waddstr(win, " [3] hell ");
 

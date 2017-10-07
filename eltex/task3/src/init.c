@@ -80,7 +80,7 @@ void init_windows(WINDOW **win, int n, int h, int w)
 	mvwprintw(win[3], 2, 16, "Size: ..");
 	mvwprintw(win[3], 2, 28, "Inode: ..");
 	mvwprintw(win[3], 2, 41, "Something else: ..");
-	mvwprintw(win[3], 2, w - 10, "v0.9b");
+	mvwprintw(win[3], 2, w - 9, "v1.0");
 	wattron(win[3], COLOR_PAIR(4));
 	box(win[3], 0, 0);
 	mvwprintw(win[3], 0, w / 2 - 4, "%3d :%3d ", 0, 0);
