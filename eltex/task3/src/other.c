@@ -20,13 +20,13 @@ void change_theme(WINDOW **win, int h, int w)
 			break;
 		case '2': // sexy
 			fg_menu = COLOR_CYAN, bg_menu = COLOR_BLACK;
-			fg_field = COLOR_MAGENTA, bg_field = COLOR_CYAN;
+			fg_field = COLOR_MAGENTA, bg_field = COLOR_WHITE;
 			fg_popup = COLOR_CYAN, bg_popup = COLOR_BLACK;
 			break;
 		case '3': // hell
 			fg_menu = COLOR_BLACK, bg_menu = COLOR_RED;
 			fg_field = COLOR_RED, bg_field = COLOR_BLACK;
-			fg_popup = COLOR_BLACK, bg_popup = COLOR_RED;
+			fg_popup = COLOR_RED, bg_popup = COLOR_BLACK;
 			break;
 		default:
 			return;
