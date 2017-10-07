@@ -32,7 +32,7 @@ void init_colors()
 	// Pair id, Foreground, Background
 	init_pair(1, COLOR_BLACK, COLOR_YELLOW);	// menu components
 	init_pair(2, COLOR_WHITE, COLOR_BLUE);		// edit field
-	init_pair(3, COLOR_YELLOW, COLOR_BLACK);	// reversed main
+	init_pair(3, COLOR_YELLOW, COLOR_BLACK);	// pop-ups
 	init_pair(4, COLOR_WHITE, COLOR_BLACK);		// borders
 }
 
@@ -70,9 +70,6 @@ void init_windows(WINDOW **win, int n, int h, int w)
 	wbkgd(win[2], COLOR_PAIR(2));
 	prefresh(win[2], 0, 0, 4, 1, h - 7, w - 1);
 
-	// Enable func keys, arrows etc.
-	keypad(win[2], TRUE);
-
 	// 3 -- Info bar
 	win[3] = newpad(5, w);
 	wbkgd(win[3], COLOR_PAIR(1));
@@ -88,6 +85,11 @@ void init_windows(WINDOW **win, int n, int h, int w)
 	box(win[3], 0, 0);
 	mvwprintw(win[3], 0, w / 2 - 4, "%3d :%3d ", 0, 0);
 	prefresh(win[3], 0, 0, h - 5, 0, h, w);
+
+	// Enable func keys, arrows etc.
+	keypad(win[2], TRUE);
+	wmove(win[2], 0, 0);
+	prefresh(win[2], 0, 0, 4, 1, h - 7, w - 1);
 }
 
 

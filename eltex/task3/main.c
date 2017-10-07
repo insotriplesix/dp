@@ -4,8 +4,9 @@
 
 int main(int argc, char *argv[])
 {
-	static char *fbuf = NULL;
-	static int fbuf_cnt = 0;
+	static char *filename = NULL;
+	static char *filebuf = NULL;
+	static int filebuf_len = 0;
 
 	WINDOW *windows[NWINS];
 
@@ -23,7 +24,7 @@ int main(int argc, char *argv[])
 	// Init default windows
 	init_windows(windows, NWINS, height, width);
 
-	fbuf = (char *) malloc(BUFSIZ * sizeof(char));
+	filebuf = (char *) malloc(BUFSIZ * sizeof(char));
 
 	// Default position of the cursor
 	int def_pos_x = 0, def_pos_y = 0;
@@ -32,13 +33,16 @@ int main(int argc, char *argv[])
 	int field_y = def_pos_y, field_x = def_pos_x;
 
 	// Set this pos in the window
-	wmove(windows[2], field_y, field_x);
 
 	int is_exit = FALSE;
+
+	ch = wgetch(windows[2]);	// <~~ enable this and magic '~Z' disappear
 
 	do {
 		ch = wgetch(windows[2]);
 
+	wmove(windows[2], field_y, field_x);
+	prefresh(windows[2], 0, 0, 4, 1, height - 7, width - 1);
 		switch (ch) {
 			case KEY_LEFT:
 				move_left(windows[2], &field_y, &field_x, -1);
@@ -59,39 +63,39 @@ int main(int argc, char *argv[])
 				pechochar(windows[2], ' ');
 				wmove(windows[2], field_y, field_x);
 
-				if (fbuf_cnt && (field_x > 1))
-					fbuf[fbuf_cnt--] = ' ';
+				if (filebuf_len && (field_x > 1))
+					filebuf[filebuf_len--] = ' ';
 				break;
 			case '\n':
 			case KEY_ENTER:
 				pechochar(windows[2], '\n');
 				field_x = def_pos_x;
 				wmove(windows[2], ++field_y, field_x);
-				fbuf[fbuf_cnt++] = '\n';
+				filebuf[filebuf_len++] = '\n';
 				break;
 			case '\t':
 				for (i = 0; i < 4; ++i) {
 					move_right(windows[2], &field_y, &field_x, width - 1);
 					pechochar(windows[2], ' ');
 					wmove(windows[2], field_y, field_x);
-					fbuf[fbuf_cnt++] = ' ';
+					filebuf[filebuf_len++] = ' ';
 				}
 				break;
 			case 15:        // ctrl+o
 			case KEY_F(4):	// Open
-				open_file(fbuf, &fbuf_cnt, height, width);
+				open_file(filebuf, &filebuf_len, height, width);
 
 				// Insert whole buffer into the editor field
-				mvwinsstr(windows[2], 0, 0, fbuf);
+				mvwinsstr(windows[2], 0, 0, filebuf);
 				break;
 			case 11:        // ctrl+k
 			case KEY_F(5):	// Save
-				save_file(fbuf, fbuf_cnt, height, width);
+				save_file(filebuf, filebuf_len, height, width);
 				break;
 			case 24:        // ctrl+x
 			case KEY_F(6):  // Extra
 			case 7:    // ctrl+G
-				change_theme(windows[2], height, width);
+				change_theme(windows, height, width);
 				//extra_options();
 				break;
 			case 8:         // ctrl+h
@@ -104,7 +108,7 @@ int main(int argc, char *argv[])
 				break;
 			default:
 				// Add input symbol to the buffer
-				fbuf[fbuf_cnt++] = (char) ch;
+				filebuf[filebuf_len++] = (char) ch;
 
 				// Display it on the edit field
 				if (field_x + 1 < width - 1) {
@@ -124,12 +128,12 @@ int main(int argc, char *argv[])
 		prefresh(windows[3], 0, 0, height - 5, 0, height, width);
 
 		prefresh(windows[2], 0, 0, 4, 1, height - 7, width - 1);
+//		flushinp();
 	} while (is_exit == FALSE);
 
-	// Free text buffer
-	free(fbuf);
+	free(filename);
+	free(filebuf);
 
-	// Set terminal in normal mode
 	endwin();
 
 	return 0;

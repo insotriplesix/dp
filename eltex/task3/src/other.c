@@ -1,30 +1,47 @@
 #include "other.h"
 
-void change_theme(WINDOW *win, int h, int w)
+void change_theme(WINDOW **win, int h, int w)
 {
 	char choice = change_theme_popup(h, w);
-	int fg, bg;
+
+	int fg_field, bg_field, fg_menu,
+		bg_menu, fg_popup, bg_popup;
 
 	switch (choice) {
-	case '0': // default
-		fg = COLOR_WHITE, bg = COLOR_BLUE;
-		break;
-	case '1': // leet
-		fg = COLOR_GREEN, bg = COLOR_BLACK;
-		break;
-	case '2': // sexy
-		fg = COLOR_CYAN, bg = COLOR_MAGENTA;
-		break;
-	case '3': // hell
-		fg = COLOR_RED, bg = COLOR_BLACK;
-		break;
-	default:
-		return;
+		case '0': // default
+			fg_menu = COLOR_BLACK, bg_menu = COLOR_YELLOW;
+			fg_field = COLOR_WHITE, bg_field = COLOR_BLUE;
+			fg_popup = COLOR_YELLOW, bg_popup = COLOR_BLACK;
+			break;
+		case '1': // leet
+			fg_menu = COLOR_BLACK, bg_menu = COLOR_GREEN;
+			fg_field = COLOR_GREEN, bg_field = COLOR_BLACK;
+			fg_popup = COLOR_GREEN, bg_popup = COLOR_BLACK;
+			break;
+		case '2': // sexy
+			fg_menu = COLOR_CYAN, bg_menu = COLOR_BLACK;
+			fg_field = COLOR_MAGENTA, bg_field = COLOR_CYAN;
+			fg_popup = COLOR_CYAN, bg_popup = COLOR_BLACK;
+			break;
+		case '3': // hell
+			fg_menu = COLOR_BLACK, bg_menu = COLOR_RED;
+			fg_field = COLOR_RED, bg_field = COLOR_BLACK;
+			fg_popup = COLOR_BLACK, bg_popup = COLOR_RED;
+			break;
+		default:
+			return;
 	}
 
-	init_pair(2, fg, bg);
-	wattrset(win, COLOR_PAIR(2));
-	wbkgd(win, COLOR_PAIR(2));
+	init_pair(1, fg_menu, bg_menu);
+	wattrset(win[0], COLOR_PAIR(1));
+
+	init_pair(2, fg_field, bg_field);
+	wattrset(win[2], COLOR_PAIR(2));
+
+	init_pair(3, fg_popup, bg_popup);
+	wattrset(win[3], COLOR_PAIR(3));
+
+//	wbkgd(win, COLOR_PAIR(2));
 }
 
 /* Editor information */
@@ -50,7 +67,7 @@ void open_file(char *buf, int *sz, int h, int w)
 
 		fclose(fp);
 	}
-
+//	strcpy
 	free(fname);
 }
 
@@ -122,7 +139,7 @@ void help_popup(int h, int w)
 	curs_set(0);
 
 	wmove(win, line++, win_width / 4);
-	waddstr(win, "5aboteditor v0.9b");
+	waddstr(win, "5aboteditor v1.0");
 	wmove(win, line++, 1);
 	waddstr(win, "");
 	wmove(win, line++, 1);
@@ -162,32 +179,24 @@ char *open_file_popup(int h, int w)
 	WINDOW *win;
 
 	char *fname = (char *) malloc(sizeof(char) * FNAME_MAX_SIZE);
-	char ch;
-	int i;
 
 	int win_height = 3;
 	int win_width = 42;
 
 	echo();
-	win = newpad(win_height, win_width);
+
+	win = newwin(win_height, win_width,
+		h/2 - win_height/2, w/2 - win_width/2);
+
 	wbkgd(win, COLOR_PAIR(3));
 	box(win, ACS_VLINE, ACS_HLINE);
-
 	mvwaddstr(win, 1, 1, " Enter file name: ");
-	//    mvwgetstr(win, 1, 20, fname);
-
-	prefresh(win, 0, 0, h / 2 - win_height / 2, w / 2 - win_width / 2,
-		h / 2 + win_height / 2, w / 2 + win_width / 2);
-
-	for (i = 0; (ch = wgetch(win)) != '\n' && i != FNAME_MAX_SIZE; ++i) {
-		fname[i] = ch;
-		prefresh(win, 0, 0, h / 2 - win_height / 2, w / 2 - win_width / 2,
-			h / 2 + win_height / 2, w / 2 + win_width / 2);
-	}
-	fname[i] = '\0';
+	wrefresh(win);
+	mvwgetstr(win, 1, 19, fname);
 
 	noecho();
-	wclear(win);
+
+	delwin(win);
 
 	return fname;
 }
@@ -197,32 +206,24 @@ char *save_file_popup(int h, int w)
 	WINDOW *win;
 
 	char *fname = (char *) malloc(sizeof(char) * FNAME_MAX_SIZE);
-	char ch;
-	int i;
 
 	int win_height = 3;
 	int win_width = 42;
 
 	echo();
-	win = newpad(win_height, win_width);
+
+	win = newwin(win_height, win_width,
+		h/2 - win_height/2, w/2 - win_width/2);
+
 	wbkgd(win, COLOR_PAIR(3));
 	box(win, ACS_VLINE, ACS_HLINE);
-
 	mvwaddstr(win, 1, 1, " Enter file name: ");
-	//    mvwgetstr(win, 1, 20, fname);
-
-	prefresh(win, 0, 0, h / 2 - win_height / 2, w / 2 - win_width / 2,
-		h / 2 + win_height / 2, w / 2 + win_width / 2);
-
-	for (i = 0; (ch = wgetch(win)) != '\n' && i != FNAME_MAX_SIZE; ++i) {
-		fname[i] = ch;
-		prefresh(win, 0, 0, h / 2 - win_height / 2, w / 2 - win_width / 2,
-			h / 2 + win_height / 2, w / 2 + win_width / 2);
-	}
-	fname[i] = '\0';
+	wrefresh(win);
+	mvwgetstr(win, 1, 19, fname);
 
 	noecho();
-	wclear(win);
+
+	delwin(win);
 
 	return fname;
 }
