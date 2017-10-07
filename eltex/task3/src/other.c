@@ -1,5 +1,7 @@
 #include "other.h"
 
+char filename[FNAME_MAX_SIZE];
+
 void change_theme(WINDOW **win, int h, int w)
 {
 	char choice = change_theme_popup(h, w);
@@ -55,11 +57,11 @@ void open_file(char *buf, int *sz, int h, int w)
 {
 	FILE *fp;
 
-	char *fname = open_file_popup(h, w);
+/*	char *fname =*/ open_file_popup(h, w);
 	char ch;
 
 	// Try to open the file
-	if ((fp = fopen(fname, "r"))) {
+	if ((fp = fopen(filename, "r"))) {
 
 		// Read the file til we reach the end of it
 		while ((ch = fgetc(fp)) != EOF)
@@ -68,7 +70,7 @@ void open_file(char *buf, int *sz, int h, int w)
 		fclose(fp);
 	}
 //	strcpy
-	free(fname);
+//	free(fname);
 }
 
 /* Save content to the file */
@@ -76,11 +78,11 @@ void save_file(char *buf, int sz, int h, int w)
 {
 	FILE *fp;
 
-	char *fname = save_file_popup(h, w);
+/*	char *fname =*/ save_file_popup(h, w);
 	int i;
 
 	// Try to open the file
-	if ((fp = fopen(fname, "w"))) {
+	if ((fp = fopen(filename, "w"))) {
 
 		// Dump buf content to the file
 		for (i = 0; i < sz; ++i)
@@ -89,7 +91,7 @@ void save_file(char *buf, int sz, int h, int w)
 		fclose(fp);
 	}
 
-	free(fname);
+//	free(fname);
 }
 
 char change_theme_popup(int h, int w)
@@ -139,7 +141,7 @@ void help_popup(int h, int w)
 	curs_set(0);
 
 	wmove(win, line++, win_width / 4);
-	waddstr(win, "5aboteditor v1.0");
+	waddstr(win, "5aboteditor v0.9b");
 	wmove(win, line++, 1);
 	waddstr(win, "");
 	wmove(win, line++, 1);
@@ -192,7 +194,7 @@ char *open_file_popup(int h, int w)
 	box(win, ACS_VLINE, ACS_HLINE);
 	mvwaddstr(win, 1, 1, " Enter file name: ");
 	wrefresh(win);
-	mvwgetstr(win, 1, 19, fname);
+	mvwgetstr(win, 1, 19, filename);
 
 	noecho();
 
@@ -219,7 +221,7 @@ char *save_file_popup(int h, int w)
 	box(win, ACS_VLINE, ACS_HLINE);
 	mvwaddstr(win, 1, 1, " Enter file name: ");
 	wrefresh(win);
-	mvwgetstr(win, 1, 19, fname);
+	mvwgetstr(win, 1, 19, filename);
 
 	noecho();
 

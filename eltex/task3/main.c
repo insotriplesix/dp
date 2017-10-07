@@ -4,7 +4,6 @@
 
 int main(int argc, char *argv[])
 {
-	static char *filename = NULL;
 	static char *filebuf = NULL;
 	static int filebuf_len = 0;
 
@@ -12,16 +11,12 @@ int main(int argc, char *argv[])
 
 	int ch, i, width, height;
 
-	// Init curses session
 	init_curses();
-
-	// Init palette
 	init_colors();
 
 	// Get the terminal size
 	getmaxyx(stdscr, height, width);
 
-	// Init default windows
 	init_windows(windows, NWINS, height, width);
 
 	filebuf = (char *) malloc(BUFSIZ * sizeof(char));
@@ -29,10 +24,8 @@ int main(int argc, char *argv[])
 	// Default position of the cursor
 	int def_pos_x = 0, def_pos_y = 0;
 
-	// Current position in the edit field
+	// Current cursor position in the edit field
 	int field_y = def_pos_y, field_x = def_pos_x;
-
-	// Set this pos in the window
 
 	int is_exit = FALSE;
 
@@ -41,8 +34,6 @@ int main(int argc, char *argv[])
 	do {
 		ch = wgetch(windows[2]);
 
-	wmove(windows[2], field_y, field_x);
-	prefresh(windows[2], 0, 0, 4, 1, height - 7, width - 1);
 		switch (ch) {
 			case KEY_LEFT:
 				move_left(windows[2], &field_y, &field_x, -1);
@@ -81,29 +72,37 @@ int main(int argc, char *argv[])
 					filebuf[filebuf_len++] = ' ';
 				}
 				break;
-			case 15:        // ctrl+o
-			case KEY_F(4):	// Open
+			// Open file
+			case CTRL_O:
+			case KEY_F(4):
 				open_file(filebuf, &filebuf_len, height, width);
-
+//				wclear(windows[2]);
 				// Insert whole buffer into the editor field
+				box(windows[1], ACS_VLINE, ACS_HLINE);
+			    mvwaddstr(windows[1], 0, width / 2 - strlen(filename) / 2, filename);
+				prefresh(windows[1], 0, 0, 3, 0, height - 6, width);
 				mvwinsstr(windows[2], 0, 0, filebuf);
 				break;
-			case 11:        // ctrl+k
-			case KEY_F(5):	// Save
+			// Save to file
+			case CTRL_K:
+			case KEY_F(5):
 				save_file(filebuf, filebuf_len, height, width);
 				break;
-			case 24:        // ctrl+x
-			case KEY_F(6):  // Extra
-			case 7:    // ctrl+G
+			// Extra options
+			case CTRL_X:
+			case KEY_F(6):
+			case CTRL_G:
 				change_theme(windows, height, width);
 				//extra_options();
 				break;
-			case 8:         // ctrl+h
-			case KEY_F(7):  // Help
+			// Help
+			case CTRL_H:
+			case KEY_F(7):
 				get_help(height, width);
 				break;
-			case 5:         // ctrl+e
-			case KEY_F(8):  // Exit
+			// Exit
+			case CTRL_E:
+			case KEY_F(8):
 				is_exit = TRUE;
 				break;
 			default:
@@ -128,10 +127,9 @@ int main(int argc, char *argv[])
 		prefresh(windows[3], 0, 0, height - 5, 0, height, width);
 
 		prefresh(windows[2], 0, 0, 4, 1, height - 7, width - 1);
-//		flushinp();
+
 	} while (is_exit == FALSE);
 
-	free(filename);
 	free(filebuf);
 
 	endwin();

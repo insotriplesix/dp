@@ -1,10 +1,7 @@
 #ifndef OTHER_H
 #define OTHER_H
 
-#include <panel.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
+#include "editor.h"
 
 #define FNAME_MAX_SIZE 128
 

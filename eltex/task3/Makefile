@@ -1,7 +1,7 @@
 EXEC=main
 CC=gcc
 CFLAGS=-std=gnu99 -Wall -g -pedantic
-LIBS=-lpanel -lncurses
+LIBS=-lncurses
 
 INCDIR=inc
 SRCDIR=src

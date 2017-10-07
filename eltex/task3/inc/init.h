@@ -1,11 +1,7 @@
 #ifndef INIT_H
 #define INIT_H
 
-#include <panel.h>
-#include <stdlib.h>
-#include <string.h>
-
-#define NWINS 4
+#include "editor.h"
 
 void init_curses();
 void init_colors();
