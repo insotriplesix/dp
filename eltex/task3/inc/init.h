@@ -5,7 +5,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-//#define NPANELS 3
 #define NWINS 4
 
 void init_curses();
