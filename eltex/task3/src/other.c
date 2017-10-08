@@ -151,21 +151,19 @@ void help_popup(int h, int w)
 	wmove(win, line++, 1);
 	waddstr(win, " F5, ^K - save to file");
 	wmove(win, line++, 1);
-	waddstr(win, " F6, ^X - extra options");
+	waddstr(win, " F6, ^E - extra options");
 	wmove(win, line++, 1);
 	waddstr(win, " F7, ^H - get help");
 	wmove(win, line++, 1);
-	waddstr(win, " F8, ^E - exit");
+	waddstr(win, " F8, ^X - exit");
 	wmove(win, line++, 1);
 	waddstr(win, "");
 	wmove(win, line++, 1);
 	waddstr(win, "--- ext --------------------");
 	wmove(win, line++, 1);
-	waddstr(win, " ^G - change editor theme");
+	waddstr(win, " ^G - change theme");
 	wmove(win, line++, 1);
-	waddstr(win, " ^W - (en/de)crypt text");
-	wmove(win, line++, 1);
-	waddstr(win, " ^? - . . . ");
+	waddstr(win, " ^Y - encrypt text");
 
 	prefresh(win, 0, 0, h / 2 - win_height / 2, w / 2 - win_width / 2,
 		h / 2 + win_height / 2, w / 2 + win_width / 2);

@@ -21,13 +21,12 @@ int main(int argc, char *argv[])
 
 	filebuf = (char *) malloc(BUFSIZ * sizeof(char));
 
-	// Default position of the cursor
-	int def_pos_x = 0, def_pos_y = 0;
-
-	// Current cursor position in the edit field
-	int field_y = def_pos_y, field_x = def_pos_x;
+	int default_pos_y = 0, default_pos_x = 0;
+	int current_pos_y = default_pos_y,
+		 current_pos_x = default_pos_x;
 
 	int is_exit = FALSE;
+	int encryption = FALSE;
 
 	ch = wgetch(windows[2]);	// <~~ enable this and magic '~Z' disappear
 
@@ -36,39 +35,38 @@ int main(int argc, char *argv[])
 
 		switch (ch) {
 			case KEY_LEFT:
-				move_left(windows[2], &field_y, &field_x, -1);
+				move_left(windows[2], &current_pos_y, &current_pos_x, -1);
 				break;
 			case KEY_RIGHT:
-				move_right(windows[2], &field_y, &field_x, width - 1);
+				move_right(windows[2], &current_pos_y, &current_pos_x, width - 1);
 				break;
 			case KEY_UP:
-				move_up(windows[2], &field_y, &field_x, -1);
+				move_up(windows[2], &current_pos_y, &current_pos_x, -1);
 				break;
 			case KEY_DOWN:
-				move_down(windows[2], &field_y, &field_x, height - 10);
+				move_down(windows[2], &current_pos_y, &current_pos_x, height - 10);
 				break;
 			case KEY_DC:
-			case 127:
 			case KEY_BACKSPACE:
-				move_left(windows[2], &field_y, &field_x, -1);
+				move_left(windows[2], &current_pos_y, &current_pos_x, -1);
 				pechochar(windows[2], ' ');
-				wmove(windows[2], field_y, field_x);
+				wmove(windows[2], current_pos_y, current_pos_x);
 
-				if (filebuf_len && (field_x > 1))
+				if (filebuf_len && (current_pos_x > 1))
 					filebuf[filebuf_len--] = ' ';
 				break;
-			case '\n':
 			case KEY_ENTER:
+			case KEY_NL:
 				pechochar(windows[2], '\n');
-				field_x = def_pos_x;
-				wmove(windows[2], ++field_y, field_x);
+				current_pos_x = default_pos_x;
+				wmove(windows[2], ++current_pos_y, current_pos_x);
 				filebuf[filebuf_len++] = '\n';
 				break;
-			case '\t':
+			case KEY_TAB:
 				for (i = 0; i < 4; ++i) {
-					move_right(windows[2], &field_y, &field_x, width - 1);
+					move_right(windows[2], &current_pos_y, &current_pos_x, width - 1);
 					pechochar(windows[2], ' ');
-					wmove(windows[2], field_y, field_x);
+					wmove(windows[2], current_pos_y, current_pos_x);
 					filebuf[filebuf_len++] = ' ';
 				}
 				break;
@@ -76,10 +74,10 @@ int main(int argc, char *argv[])
 			case CTRL_O:
 			case KEY_F(4):
 				open_file(filebuf, &filebuf_len, height, width);
-//				wclear(windows[2]);
+				wclear(windows[2]);
 				// Insert whole buffer into the editor field
 				box(windows[1], ACS_VLINE, ACS_HLINE);
-			    mvwaddstr(windows[1], 0, width / 2 - strlen(filename) / 2, filename);
+			    mvwaddstr(windows[1], 0, width/2 - strlen(filename)/2, filename);
 				prefresh(windows[1], 0, 0, 3, 0, height - 6, width);
 				mvwinsstr(windows[2], 0, 0, filebuf);
 				break;
@@ -89,11 +87,14 @@ int main(int argc, char *argv[])
 				save_file(filebuf, filebuf_len, height, width);
 				break;
 			// Extra options
-			case CTRL_X:
+			case CTRL_E:
 			case KEY_F(6):
 			case CTRL_G:
 				change_theme(windows, height, width);
 				//extra_options();
+				break;
+			case CTRL_Y:
+				encryption = (encryption == FALSE) ? TRUE : FALSE;
 				break;
 			// Help
 			case CTRL_H:
@@ -101,32 +102,34 @@ int main(int argc, char *argv[])
 				get_help(height, width);
 				break;
 			// Exit
-			case CTRL_E:
+			case CTRL_X:
 			case KEY_F(8):
 				is_exit = TRUE;
 				break;
 			default:
-				// Add input symbol to the buffer
-				filebuf[filebuf_len++] = (char) ch;
+				if (encryption == TRUE) {
+					ch ^= 1;
+					filebuf[filebuf_len++] = (char) ch;
+				}
+				else
+					filebuf[filebuf_len++] = (char) ch;
 
-				// Display it on the edit field
-				if (field_x + 1 < width - 1) {
+				if (current_pos_x + 1 < width - 1) {
 					pechochar(windows[2], ch);
-					move_right(windows[2], &field_y, &field_x, width);
+					move_right(windows[2], &current_pos_y, &current_pos_x, width);
 				} else {
-					++field_y;
-					field_x = def_pos_x;
-					wmove(windows[2], field_y, field_x);
+					++current_pos_y;
+					current_pos_x = default_pos_x;
+					wmove(windows[2], current_pos_y, current_pos_x);
 					pechochar(windows[2], ch);
-					move_right(windows[2], &field_y, &field_x, width);
+					move_right(windows[2], &current_pos_y, &current_pos_x, width);
 				}
 		}
 
 		// Dump the changed content on the screen
-		mvwprintw(windows[3], 0, width / 2 - 4, "%3d :%3d ", field_y + 1, field_x + 1);
+		mvwprintw(windows[3], 0, width/2 - 4, " %3d : %3d ", current_pos_y + 1, current_pos_x + 1);
 		prefresh(windows[3], 0, 0, height - 5, 0, height, width);
-
-		prefresh(windows[2], 0, 0, 4, 1, height - 7, width - 1);
+		prefresh(windows[2], 0, 0, 4, 1, height - 7, width - 2);
 
 	} while (is_exit == FALSE);
 

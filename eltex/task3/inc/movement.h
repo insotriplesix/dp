@@ -1,7 +1,7 @@
 #ifndef MOVEMENT_H
 #define MOVEMENT_H
 
-#include <panel.h>
+#include "editor.h"
 
 void move_left(WINDOW *win, int *y, int *x, int b);
 void move_right(WINDOW *win, int *y, int *x, int b);

@@ -2,33 +2,22 @@
 
 char filename[FNAME_MAX_SIZE];
 
-/* Init curses session */
 void init_curses()
 {
-	// Initialize the terminal in curses mode
 	initscr();
-
-	// Clear the screen
 	clear();
-
-	// Disable line buffering
 	cbreak();	// or raw() ?
-
-	// Switch off echoing
 	noecho();
 }
 
-/* Init palette */
 void init_colors()
 {
-	// Check colouring support
 	if (!has_colors()) {
 		endwin();
 		printf("This terminal doesn't support colouring.\n");
 		exit(1);
 	}
 
-	// Start color functionality
 	start_color();
 
 	// Pair id, Foreground, Background
@@ -41,24 +30,29 @@ void init_colors()
 /* Init default windows */
 void init_windows(WINDOW **win, int n, int h, int w)
 {
-//	char *fname = " untitled ";
-	strcpy(filename, "untitled");
 	// 0 -- Menu bar
 	win[0] = newpad(3, w);
 	wbkgd(win[0], COLOR_PAIR(4));
 	box(win[0], ACS_VLINE, ACS_HLINE);
-	wmove(win[0], 1, 1);
 
 	wattron(win[0], COLOR_PAIR(1));
 
-	mvwprintw(win[0], 1, 2, "  F4 - Open  ");
-	mvwprintw(win[0], 1, 17, "  F5 - Save  ");
-	mvwprintw(win[0], 1, 32, "  F6 - Extra  ");
-	mvwprintw(win[0], 1, 48, "  F7 - Help  ");
-	mvwprintw(win[0], 1, 63, "  F8 - Exit  ");
+	int offset = 2;
+
+	mvwprintw(win[0], 1, offset, "  F4 - Open  ");
+	offset += 15;
+	mvwprintw(win[0], 1, offset, "  F5 - Save  ");
+	offset += 15;
+	mvwprintw(win[0], 1, offset, "  F6 - Extra  ");
+	offset += 16;
+	mvwprintw(win[0], 1, offset, "  F7 - Help  ");
+	offset += 15;
+	mvwprintw(win[0], 1, offset, "  F8 - Exit  ");
 	mvwprintw(win[0], 1, w - 20, " made by 5aboteur ");
 
 	prefresh(win[0], 0, 0, 0, 0, 2, w);
+
+	strcpy(filename, "untitled");
 
 	// 1 -- Editing area box
 	win[1] = newpad(h - 6, w);
@@ -68,9 +62,9 @@ void init_windows(WINDOW **win, int n, int h, int w)
 	prefresh(win[1], 0, 0, 3, 0, h - 6, w);
 
 	// 2 -- Editing area
-	win[2] = newpad(h - 8, w - 2);
+	win[2] = newpad(h - 7, w - 2);
 	wbkgd(win[2], COLOR_PAIR(2));
-	prefresh(win[2], 0, 0, 4, 1, h - 7, w - 1);
+	prefresh(win[2], 0, 0, 4, 1, h - 7, w - 2);
 
 	// 3 -- Info bar
 	win[3] = newpad(5, w);
@@ -78,7 +72,7 @@ void init_windows(WINDOW **win, int n, int h, int w)
 	box(win[3], ACS_VLINE, ACS_HLINE);
 	wattron(win[3], COLOR_PAIR(1));
 
-	int offset = 4;
+	offset = 4;
 
 	mvwprintw(win[3], 2, offset, "FILE: %s", filename);
 	offset += 10 + strlen(filename);
@@ -94,7 +88,7 @@ void init_windows(WINDOW **win, int n, int h, int w)
 	wattron(win[3], COLOR_PAIR(4));
 	box(win[3], 0, 0);
 
-	mvwprintw(win[3], 0, w / 2 - 4, "%3d :%3d ", 0, 0);
+	mvwprintw(win[3], 0, w / 2 - 4, " %3d : %3d ", 0, 0);
 
 	prefresh(win[3], 0, 0, h - 5, 0, h, w);
 

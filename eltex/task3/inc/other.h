@@ -3,8 +3,6 @@
 
 #include "editor.h"
 
-#define FNAME_MAX_SIZE 128
-
 void change_theme(WINDOW **win, int h, int w);
 void get_help(int h, int w);
 void open_file(char *buf, int *sz, int h, int w);
