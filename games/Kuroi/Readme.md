@@ -12,7 +12,7 @@ A short game about dark ninja who is going to save his gf.
 
 #### v?.?
 
-* Something
+* FROZEN
 
 ### --- Refs --------------------------
 
