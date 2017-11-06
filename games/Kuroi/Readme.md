@@ -6,7 +6,7 @@
 
 ### --- Descr --------------------------
 
-A short game about dark ninja who is going to save his wife.
+A short game about dark ninja who is going to save his gf.
 
 ### --- Func --------------------------
 
