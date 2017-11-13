@@ -9,9 +9,6 @@
 #include "CLI.hpp"
 #include "Game.hpp"
 
-class CLI;
-class Game;
-
 class GameState {
 public:
 	GameState(std::shared_ptr<Game> _game_data)
