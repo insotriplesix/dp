@@ -3,6 +3,7 @@
 
 #include "GameStateManager.hpp"
 
+// this will be moved to the GameStateManager class
 class GameController {
 public:
 	GameController(std::shared_ptr<Game> _game,
