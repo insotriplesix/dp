@@ -1,4 +1,4 @@
-EXEC := shm_chat
+EXEC := chat
 CC := gcc
 CFLAGS := -std=gnu99 -Wall -Wextra -g -pedantic -O2
 LDLIBS := -lncurses
