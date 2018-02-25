@@ -4,8 +4,6 @@
 void
 finalize(void)
 {
-//	list_mem_free(&users);
-
 	sprintf(chat_buf, "* : %s left", user.nickname);
 
 	if (usr1_sem == USR1_SEM) {
@@ -40,9 +38,9 @@ initialize(int argc, char *argv[])
 	}
 
 	init_user(argc, argv);
+
 	current_line_left = 1;
 	current_line_rite = 1;
-//	list_init(&users);
 }
 
 int
@@ -75,7 +73,7 @@ init_gui(void)
 int
 init_ncurses(void)
 {
-	return (initscr() != NULL) & clear() & cbreak()/* & noecho()*/;
+	return (initscr() != NULL) & clear() & cbreak();
 }
 
 int
@@ -110,7 +108,6 @@ init_windows(void)
 int
 init_user(int argc, char *argv[])
 {
-//	char name[NICKNAME_MAX];
 	unsigned short vals[2];
 
 	input_nickname();

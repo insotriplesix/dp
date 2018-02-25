@@ -69,30 +69,18 @@ input_nickname(void)
 	wattroff(win, BORDER_CLR);
 	wbkgd(win, POPUP_CLR);
 
-//	echo();
-
 	mvwaddstr(win, 1, 1, " Input nickname: ");
 	wrefresh(win);
-//	memset(content.file.name, '\0', FILENAME_MAX);
-//	scrollok(win, TRUE);
-//	idlok(win, TRUE);
-//	nonl();
-//	char fname[FILENAME_MAX];
+
 	curs_set(TRUE);
 	mvwgetstr(win, 1, 18, user.nickname);
 	curs_set(FALSE);
 
 	user.id = getpid();
 
-//	noecho();
-
 	wclear(win);
 	wrefresh(win);
 	delwin(win);
 
-	// race condition stuff :)
-//	list_add_data(&users, global_index++, fname, strlen(fname));
-
 	return OK;
-//	return assign_nickname(fname);
 }

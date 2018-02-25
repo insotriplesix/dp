@@ -49,8 +49,6 @@ struct user_t {
 
 struct user_t user;
 
-//struct list_t users;
-
 int shmem_alloc(int n);
 void *shmem_map(int id);
 

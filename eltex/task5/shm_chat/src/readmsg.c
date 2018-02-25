@@ -6,7 +6,6 @@ readmsg(void)
 	int rc = OK;
 	char msg[BUFSIZ - FILENAME_MAX];
 
-//	mvwprintw(win[RITE_W], 0, 5, "%ld", strlen(chat_buf));
 	if (strncmp(chat_buf, "* :", 3) == 0) {
 		repaint_window(LEFT_W);
 		current_line_left = 0;
@@ -22,13 +21,10 @@ readmsg(void)
 
 		wrefresh(win[LEFT_W]);
 
-//		current_line_rite = 0;
-
 		wattron(win[RITE_W], NOTIFY_CLR);
 		mvwprintw(win[RITE_W], ++current_line_rite, 1, "%s", chat_buf);
 		wattroff(win[RITE_W], NOTIFY_CLR);
-	}
-	else if (strlen(chat_buf) > 0 && strcmp(chat_buf, " ") != 0)
+	} else if (strlen(chat_buf) > 0 && strcmp(chat_buf, " ") != 0)
 		mvwprintw(win[RITE_W], ++current_line_rite, 1, "%s", chat_buf);
 
 	wrefresh(win[RITE_W]);
@@ -39,19 +35,11 @@ readmsg(void)
 	wgetstr(win[BOTM_W], msg);
 	curs_set(FALSE);
 
-	if (strcmp(msg, "\\quit") == 0) {
+	if (strcmp(msg, "\\quit") == 0)
 		rc = ERR;
-//		finalize();
-//		exit(EXIT_SUCCESS);
-	} else {
-//		wmove(win[RITE_W], LINES - 5, FILENAME_MAX + 4);
-//		wclrtoeol(win[RITE_W]);
-//		mvwprintw(win[RITE_W], LINES - 5, FILENAME_MAX + 4,
-
+	else
 		sprintf(chat_buf, "%s : %s", user.nickname, msg);
-	}
 
-//	shift_messages();
 	mvwprintw(win[RITE_W], ++current_line_rite, 1, "%s", chat_buf);
 
 	return rc;
