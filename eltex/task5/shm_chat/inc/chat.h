@@ -12,8 +12,6 @@
 #include <sys/shm.h>
 #include <unistd.h>
 
-#include "list.h"
-
 #define DEFPOS_X 1
 #define DEFPOS_Y 1
 #define NICKNAME_MAX 24
