@@ -74,7 +74,7 @@ initialize(int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 
-	init_user(argc, argv);
+	init_user(argc/*, argv*/);
 
 	current_line_left = 1;
 	current_line_rite = 1;
@@ -151,7 +151,7 @@ init_windows(void)
 }
 
 int
-init_user(int argc, char *argv[])
+init_user(int argc/*, char *argv[]*/)
 {
 //	unsigned short vals[2];
 
@@ -191,6 +191,19 @@ init_user(int argc, char *argv[])
 		usr2_sem = USR1_SEM;
 */
 // SND MSG
+
+		struct msg_t msg_send;
+		msg_send.type = usr1;
+		char usr_left_msg[NICKNAME_MAX + 10];
+		sprintf(usr_left_msg, "%s joined", user.nickname);
+		strcpy(msg_send.text + BUFSIZE - NICKNAME_MAX, "*");
+		strcpy(msg_send.text, usr_left_msg);
+
+		if ((send_message(qid, &msg_send)) == ERR) {
+			//stub
+		}
+
+
 //		sprintf(chat_buf, "* : %s joined", user.nickname);
 /*		memcpy(chat_buf + BUFSIZ + NICKNAME_MAX, user.nickname,
 			sizeof(char) * NICKNAME_MAX);

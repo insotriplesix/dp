@@ -8,11 +8,13 @@ msg_recv_func(void *arg)
 	struct msg_t msg_recv;
 
 	while (!user_left) {
-		if ((recv_message(qid, usr2, &msg_recv)) == OK) {
+		// usr1 -> 1, usr2 -> 0
+		if ((recv_message(qid, usr2, &msg_recv)) != ERR) {
 			mvwprintw(win[RITE_W], ++current_line_rite, 1, "%s : %s",
 				msg_recv.text + BUFSIZE - NICKNAME_MAX, msg_recv.text);
 
 			wrefresh(win[RITE_W]);
+			wmove(win[BOTM_W], DEFPOS_Y, DEFPOS_X);
 //		message_arrived = TRUE;
 		}
 	}
@@ -57,6 +59,8 @@ readmsg(void)
 	struct msg_t msg_send;
 //	msg_send.user_id = user.id;
 	strcpy(msg_send.text + BUFSIZE - NICKNAME_MAX, user.nickname);
+
+	// usr1 -> 0, usr2 -> 1
 	msg_send.type = usr1;
 
 	curs_set(TRUE);

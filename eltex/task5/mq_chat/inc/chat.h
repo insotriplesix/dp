@@ -34,7 +34,7 @@ union semun {
 
 WINDOW *win[NWINDOWS];
 
-enum usr_t { USR1, USR2 };
+enum usr_t { USR0, USR1, USR2 };
 //enum sem_t { USR1_SEM, USR2_SEM };
 enum win_t { LEFT_W, RITE_W, BOTM_W };
 

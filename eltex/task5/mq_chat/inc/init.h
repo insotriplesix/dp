@@ -13,6 +13,6 @@ int init_gui(void);
 int init_ncurses(void);
 int init_windows(void);
 
-int init_user(int argc, char *argv[]);
+int init_user(int argc/*, char *argv[]*/);
 
 #endif
