@@ -1,1 +1,3 @@
-# Descr coming soon
+# mq_chat
+
+Simple chat application using Linux message queue.
