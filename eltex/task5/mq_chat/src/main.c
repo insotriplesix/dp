@@ -11,9 +11,7 @@ main(int argc, char *argv[])
 
 	while (0x1) {
 		update_gui();
-//		sem_lock(id_sem, usr1_sem);
 		rc = readmsg();
-//		sem_unlock(id_sem, usr2_sem);
 		if (rc == ERR) break;
 	}
 
