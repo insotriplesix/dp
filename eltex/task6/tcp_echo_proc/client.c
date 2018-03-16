@@ -18,7 +18,7 @@ main(int argc, char *argv[])
 
 	sockfd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 	if (sockfd < 0) {
-		printf(_RED_CLR"[System] "_DEF_CLR);
+		fprintf(stderr, _RED_CLR"[System] "_DEF_CLR);
 		perror("socket");
 		exit(EXIT_FAILURE);
 	}
@@ -42,23 +42,23 @@ main(int argc, char *argv[])
 
 	printf(_YELLOW_CLR"Client:"_DEF_CLR" connected!\n");
 
-	signal(SIGCHLD, (__sighandler_t) killproc);
+	signal(SIGINT, (__sighandler_t) killproc);
 
 	while (0x1) {
-		char chkmsg[MSGSIZ];
+		char packet[MSGSIZ];
 
-		bytes = recv(sockfd, chkmsg, MSGSIZ, 0);
+		bytes = recv(sockfd, packet, MSGSIZ, 0);
 		if (bytes < 0) {
-			printf(_RED_CLR"[System] "_DEF_CLR);
+			fprintf(stderr, _RED_CLR"[System] "_DEF_CLR);
 			perror("send");
 			exit(EXIT_FAILURE);
 		}
 
-		printf(_YELLOW_CLR"Client:"_DEF_CLR" check message: %s\n", chkmsg);
+		printf(_YELLOW_CLR"Client:"_DEF_CLR" received packet: %s\n", packet);
 
-		bytes = send(sockfd, chkmsg, MSGSIZ, 0);
+		bytes = send(sockfd, packet, MSGSIZ, 0);
 		if (bytes < 0) {
-			printf(_RED_CLR"[System] "_DEF_CLR);
+			fprintf(stderr, _RED_CLR"[System] "_DEF_CLR);
 			perror("recv");
 			exit(EXIT_FAILURE);
 		}
@@ -72,7 +72,7 @@ main(int argc, char *argv[])
 void
 killproc(void)
 {
-	int status = 0;
-	wait(&status);
 	close(sockfd);
+	printf(_YELLOW_CLR"Client:"_DEF_CLR" quit.\n");
+	exit(EXIT_SUCCESS);
 }

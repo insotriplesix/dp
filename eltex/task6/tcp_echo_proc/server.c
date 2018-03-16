@@ -21,7 +21,7 @@ main(int argc, char *argv[])
 
 	listenfd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 	if (listenfd < 0) {
-		printf(_RED_CLR"[System] "_DEF_CLR);
+		fprintf(stderr, _RED_CLR"[System] "_DEF_CLR);
 		perror("socket");
 		exit(EXIT_FAILURE);
 	}
@@ -31,7 +31,7 @@ main(int argc, char *argv[])
 	rc = setsockopt(listenfd, SOL_SOCKET, SO_REUSEADDR,
 		(const void *) &optval, sizeof(optval));
 	if (rc < 0) {
-		printf(_RED_CLR"[System] "_DEF_CLR);
+		fprintf(stderr, _RED_CLR"[System] "_DEF_CLR);
 		perror("setsockopt");
 		exit(EXIT_FAILURE);
 	}
@@ -43,7 +43,7 @@ main(int argc, char *argv[])
 
 	rc = bind(listenfd, (struct sockaddr *) &serv_addr, serv_len);
 	if (rc < 0) {
-		printf(_RED_CLR"[System] "_DEF_CLR);
+		fprintf(stderr, _RED_CLR"[System] "_DEF_CLR);
 		perror("bind");
 		exit(EXIT_FAILURE);
 	}
@@ -51,7 +51,7 @@ main(int argc, char *argv[])
 	rc = getsockname(listenfd, (struct sockaddr *) &serv_addr,
 		(socklen_t *) &serv_len);
 	if (rc < 0) {
-		printf(_RED_CLR"[System] "_DEF_CLR);
+		fprintf(stderr, _RED_CLR"[System] "_DEF_CLR);
 		perror("getsockname");
 		exit(EXIT_FAILURE);
 	}
@@ -59,9 +59,9 @@ main(int argc, char *argv[])
 	printf(_BLUE_CLR"[Server]"_DEF_CLR" port: %d\n",
 		ntohs(serv_addr.sin_port));
 
-	rc = listen(listenfd, 2);
+	rc = listen(listenfd, 5);
 	if (rc < 0) {
-		printf(_RED_CLR"[System] "_DEF_CLR);
+		fprintf(stderr, _RED_CLR"[System] "_DEF_CLR);
 		perror("listen");
 		exit(EXIT_FAILURE);
 	}
@@ -72,7 +72,7 @@ main(int argc, char *argv[])
 		sockfd = accept(listenfd, (struct sockaddr *) &clnt_addr,
 			(socklen_t *) &clnt_len);
 		if (sockfd < 0) {
-			printf(_RED_CLR"[System] "_DEF_CLR);
+			fprintf(stderr, _RED_CLR"[System] "_DEF_CLR);
 			perror("accept");
 			exit(EXIT_FAILURE);
 		}
@@ -80,7 +80,7 @@ main(int argc, char *argv[])
 		clnt_host = gethostbyaddr((const char *) &clnt_addr.sin_addr.s_addr,
 			sizeof(clnt_addr.sin_addr.s_addr), AF_INET);
 		if (clnt_host == NULL) {
-			printf(_RED_CLR"[System] "_DEF_CLR);
+			fprintf(stderr, _RED_CLR"[System] "_DEF_CLR);
 			perror("gethostbyaddr");
 			exit(EXIT_FAILURE);
 		}
@@ -90,7 +90,7 @@ main(int argc, char *argv[])
 
 		switch (fork()) {
 		case -1:
-			printf(_RED_CLR"[System] "_DEF_CLR);
+			fprintf(stderr, _RED_CLR"[System] "_DEF_CLR);
 			perror("fork");
 			exit(EXIT_FAILURE);
 			break;
@@ -112,20 +112,20 @@ server_routine(void)
 	int bytes;
 
 	while (0x1) {
-		char chkmsg[MSGSIZ];
+		char packet[MSGSIZ];
 
-		msggen(chkmsg);
+		msggen(packet);
 
-		bytes = send(sockfd, chkmsg, MSGSIZ, 0);
+		bytes = send(sockfd, packet, MSGSIZ, 0);
 		if (bytes < 0) {
-			printf(_RED_CLR"[System] "_DEF_CLR);
+			fprintf(stderr, _RED_CLR"[System] "_DEF_CLR);
 			perror("send");
 			exit(EXIT_FAILURE);
 		}
 
-		bytes = recv(sockfd, chkmsg, MSGSIZ, 0);
+		bytes = recv(sockfd, packet, MSGSIZ, 0);
 		if (bytes < 0) {
-			printf(_RED_CLR"[System] "_DEF_CLR);
+			fprintf(stderr, _RED_CLR"[System] "_DEF_CLR);
 			perror("recv");
 			exit(EXIT_FAILURE);
 		}
