@@ -14,12 +14,13 @@ main(int argc, char *argv[])
 
 	if (argc < 2) {
 		port = _DEF_PORT;
-		printf(_RED_CLR"Using default port: %d\n"_DEF_CLR, port);
+		printf(_RED_CLR"[System]"_DEF_CLR" using default port: %d\n", port);
 	} else
 		port = atoi(argv[1]);
 
 	listenfd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 	if (listenfd < 0) {
+		fprintf(stderr, _RED_CLR"[System] "_DEF_CLR);
 		perror("socket");
 		exit(EXIT_FAILURE);
 	}
@@ -29,6 +30,7 @@ main(int argc, char *argv[])
 	rc = setsockopt(listenfd, SOL_SOCKET, SO_REUSEADDR,
 		(const void *) &optval, sizeof(optval));
 	if (rc < 0) {
+		fprintf(stderr, _RED_CLR"[System] "_DEF_CLR);
 		perror("setsockopt");
 		exit(EXIT_FAILURE);
 	}
@@ -40,6 +42,7 @@ main(int argc, char *argv[])
 
 	rc = bind(listenfd, (struct sockaddr *) &serv_addr, serv_len);
 	if (rc < 0) {
+		fprintf(stderr, _RED_CLR"[System] "_DEF_CLR);
 		perror("bind");
 		exit(EXIT_FAILURE);
 	}
@@ -47,15 +50,17 @@ main(int argc, char *argv[])
 	rc = getsockname(listenfd, (struct sockaddr *) &serv_addr,
 		(socklen_t *) &serv_len);
 	if (rc < 0) {
+		fprintf(stderr, _RED_CLR"[System] "_DEF_CLR);
 		perror("getsockname");
 		exit(EXIT_FAILURE);
 	}
 
-	printf(_BLUE_CLR"Server:"_DEF_CLR" port -- %d\n",
+	printf(_BLUE_CLR"[Server]"_DEF_CLR" port: %d\n",
 		ntohs(serv_addr.sin_port));
 
 	rc = listen(listenfd, 1);
 	if (rc < 0) {
+		fprintf(stderr, _RED_CLR"[System] "_DEF_CLR);
 		perror("listen");
 		exit(EXIT_FAILURE);
 	}
@@ -63,6 +68,7 @@ main(int argc, char *argv[])
 	sockfd = accept(listenfd, (struct sockaddr *) &clnt_addr,
 		(socklen_t *) &clnt_len);
 	if (sockfd < 0) {
+		fprintf(stderr, _RED_CLR"[System] "_DEF_CLR);
 		perror("accept");
 		exit(EXIT_FAILURE);
 	}
@@ -70,30 +76,33 @@ main(int argc, char *argv[])
 	clnt_host = gethostbyaddr((const char *) &clnt_addr.sin_addr.s_addr,
 		sizeof(clnt_addr.sin_addr.s_addr), AF_INET);
 	if (clnt_host == NULL) {
+		fprintf(stderr, _RED_CLR"[System] "_DEF_CLR);
 		perror("gethostbyaddr");
 		exit(EXIT_FAILURE);
 	}
 
 	close(listenfd);
 
-	printf(_BLUE_CLR"Server:"_DEF_CLR" established connection with %s ~> %s:%d\n",
+	printf(_BLUE_CLR"[Server]"_DEF_CLR" established connection with %s ~> %s:%d\n",
 		clnt_host->h_name, inet_ntoa(clnt_addr.sin_addr), ntohs(clnt_addr.sin_port));
 
 	signal(SIGCHLD, (__sighandler_t) killproc);
 
 	while (0x1) {
-		char chkmsg[MSGSIZ];
+		char packet[MSGSIZ];
 
-		msggen(chkmsg);
+		msggen(packet);
 
-		bytes = send(sockfd, chkmsg, MSGSIZ, 0);
+		bytes = send(sockfd, packet, MSGSIZ, 0);
 		if (bytes < 0) {
+			fprintf(stderr, _RED_CLR"[System] "_DEF_CLR);
 			perror("send");
 			exit(EXIT_FAILURE);
 		}
 
-		bytes = recv(sockfd, chkmsg, MSGSIZ, 0);
+		bytes = recv(sockfd, packet, MSGSIZ, 0);
 		if (bytes < 0) {
+			fprintf(stderr, _RED_CLR"[System] "_DEF_CLR);
 			perror("recv");
 			exit(EXIT_FAILURE);
 		}
