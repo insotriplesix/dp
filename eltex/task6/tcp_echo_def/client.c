@@ -42,7 +42,7 @@ main(int argc, char *argv[])
 
 	printf(_YELLOW_CLR"Client:"_DEF_CLR" connected!\n");
 
-	signal(SIGCHLD, (__sighandler_t) killproc);
+	signal(SIGINT, (__sighandler_t) killproc);
 
 	while (0x1) {
 		char packet[MSGSIZ];
@@ -72,7 +72,7 @@ main(int argc, char *argv[])
 void
 killproc(void)
 {
-	int status = 0;
-	wait(&status);
 	close(sockfd);
+	printf(_YELLOW_CLR"Client:"_DEF_CLR" quit.\n");
+	exit(EXIT_SUCCESS);
 }

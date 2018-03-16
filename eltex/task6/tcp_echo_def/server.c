@@ -86,8 +86,6 @@ main(int argc, char *argv[])
 	printf(_BLUE_CLR"[Server]"_DEF_CLR" established connection with %s ~> %s:%d\n",
 		clnt_host->h_name, inet_ntoa(clnt_addr.sin_addr), ntohs(clnt_addr.sin_port));
 
-	signal(SIGCHLD, (__sighandler_t) killproc);
-
 	while (0x1) {
 		char packet[MSGSIZ];
 
@@ -97,26 +95,20 @@ main(int argc, char *argv[])
 		if (bytes < 0) {
 			fprintf(stderr, _RED_CLR"[System] "_DEF_CLR);
 			perror("send");
-			exit(EXIT_FAILURE);
+			printf(_BLUE_CLR"[Server]"_DEF_CLR" quit.\n");
+			exit(EXIT_SUCCESS);
 		}
 
 		bytes = recv(sockfd, packet, MSGSIZ, 0);
 		if (bytes < 0) {
 			fprintf(stderr, _RED_CLR"[System] "_DEF_CLR);
 			perror("recv");
-			exit(EXIT_FAILURE);
+			printf(_BLUE_CLR"[Server]"_DEF_CLR" quit.\n");
+			exit(EXIT_SUCCESS);
 		}
 	}
 
 	return 0;
-}
-
-void
-killproc(void)
-{
-	int wstatus = 0;
-	wait(&wstatus);
-	close(sockfd);
 }
 
 void
