@@ -106,7 +106,7 @@ main(int argc, char *argv[])
 	return 0;
 }
 
-void
+void __attribute__ ((noreturn))
 server_routine(void)
 {
 	int bytes;
