@@ -31,7 +31,7 @@
 
 int port;
 
-void killproc(void);
+void __attribute__ ((noreturn)) killproc(void);
 void msggen(char *msg);
 
 #endif
