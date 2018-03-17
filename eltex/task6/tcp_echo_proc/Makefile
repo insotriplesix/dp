@@ -3,9 +3,6 @@ SERV := server
 CC := gcc
 CFLAGS := -std=gnu99 -Wall -Wextra -g -pedantic -O2
 
-INCDIR := inc
-SRCDIR := src
-
 all: clean $(CLNT) $(SERV)
 
 $(CLNT):
