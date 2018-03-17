@@ -141,7 +141,7 @@ server_routine(void *_sfd)
 			if (pool.m_cursize > 0) {
 				printf(_RED_CLR"[System]"_DEF_CLR" current pool:\n");
 				for (int i = 0; i < pool.m_cursize; ++i)
-					printf("  [%d]: 0x%x\n", i, (unsigned int) pool.m_threads[i]);
+					printf("  [%d]: 0x%lx\n", i, (unsigned long) pool.m_threads[i]);
 			}
 
 			close(_sockfd);
@@ -158,7 +158,7 @@ server_routine(void *_sfd)
 			if (pool.m_cursize > 0) {
 				printf(_RED_CLR"[System]"_DEF_CLR" current pool:\n");
 				for (int i = 0; i < pool.m_cursize; ++i)
-					printf("  [%d]: 0x%x\n", i, (unsigned int) pool.m_threads[i]);
+					printf("  [%d]: 0x%lx\n", i, (unsigned long) pool.m_threads[i]);
 			}
 
 			close(_sockfd);
@@ -183,7 +183,7 @@ void killthr(void)
 		if (pool.m_cursize > 0) {
 			printf(_RED_CLR"[System]"_DEF_CLR" current pool:\n");
 			for (int i = 0; i < pool.m_cursize; ++i)
-				printf("  [%d]: 0x%x\n", i, (unsigned int) pool.m_threads[i]);
+				printf("  [%d]: 0x%lx\n", i, (unsigned long) pool.m_threads[i]);
 		}
 
 		pthread_exit(NULL);
