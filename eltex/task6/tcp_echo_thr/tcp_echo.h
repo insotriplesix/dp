@@ -36,7 +36,7 @@ int port;
 
 void *server_routine(void *_sfd);
 void killthr(void);
-void killproc(void);
+void __attribute__ ((noreturn)) killproc(void);
 void msggen(char *msg);
 
 #endif

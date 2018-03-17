@@ -172,7 +172,8 @@ server_routine(void *_sfd)
 	return NULL;
 }
 
-void killthr(void)
+void
+killthr(void)
 {
 	printf(_BLUE_CLR"[Server]"_DEF_CLR" active clients: %d\n", --nclients);
 
@@ -190,7 +191,7 @@ void killthr(void)
 	}
 }
 
-void
+void __attribute__ ((noreturn))
 killproc(void)
 {
 	close(listenfd);

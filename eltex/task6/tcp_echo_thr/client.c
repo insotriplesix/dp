@@ -35,7 +35,7 @@ main(int argc, char *argv[])
 		if (rc >= 0)
 			connected = 1;
 		else {
-			puts(_YELLOW_CLR"Client:"_DEF_CLR" connection refused...\n");
+			printf(_YELLOW_CLR"Client:"_DEF_CLR" connection refused...\n");
 			sleep(1);
 		}
 	} while (!connected);
@@ -69,7 +69,7 @@ main(int argc, char *argv[])
 	return 0;
 }
 
-void
+void __attribute__ ((noreturn))
 killproc(void)
 {
 	close(sockfd);
