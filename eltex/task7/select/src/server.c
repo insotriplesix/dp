@@ -2,14 +2,10 @@
 #include "tcp_udp_server.h"
 
 static int tcp_sockfd, udp_sockfd, tcp_listenfd;
-static int nclients;
+static int tclnts, uclnts, nclnts;
 static struct threadpool_t pool;
 
-// udp transfer info
-struct uti_t {
-	int sockfd;
-	struct sockaddr_in addr;
-};
+static unsigned short udp_clients[MAX_THREADS];
 
 int
 main(int argc, char *argv[])
@@ -104,6 +100,8 @@ main(int argc, char *argv[])
 
 	tp_init(&pool);
 
+	srand((unsigned) time(NULL));
+
 	while (0x1) {
 		FD_ZERO(&readfds);
 		FD_SET(tcp_listenfd, &readfds);
@@ -146,7 +144,9 @@ main(int argc, char *argv[])
 				exit(EXIT_FAILURE);
 			}
 
-			printf(_BLUE_CLR"[Server]"_DEF_CLR" active clients: %d\n", ++nclients);
+			++tclnts; ++nclnts;
+
+			printf(_BLUE_CLR"[Server]"_DEF_CLR" active clients: %d\n", nclnts);
 		}
 
 		if (FD_ISSET(udp_sockfd, &readfds)) {
@@ -167,21 +167,49 @@ main(int argc, char *argv[])
 				exit(EXIT_FAILURE);
 			}
 
-			printf(_BLUE_CLR"[Server]"_DEF_CLR" established connection with %s ~> %s:%d\n",
-				clnt_host->h_name, inet_ntoa(clnt_addr.sin_addr), ntohs(clnt_addr.sin_port));
+			if (!is_active_udp_client(ntohs(clnt_addr.sin_port))) {
+				printf(_BLUE_CLR"[Server]"_DEF_CLR" established connection with %s ~> %s:%d\n",
+					clnt_host->h_name, inet_ntoa(clnt_addr.sin_addr), ntohs(clnt_addr.sin_port));
 
-			struct uti_t *_uti = malloc(sizeof(struct uti_t));
-			_uti->sockfd = udp_sockfd;
-			_uti->addr = clnt_addr;
+				udp_clients[uclnts] = ntohs(clnt_addr.sin_port);
+				++uclnts; ++nclnts;
 
-			rc = pthread_create(&client_thr[cid++], NULL, &udp_routine, (void *) _uti);
-			if (rc != 0) {
+				printf(_BLUE_CLR"[Server]"_DEF_CLR" active clients: %d\n", nclnts);
+			}
+
+			char packet[PKTSIZ];
+
+			udp_pkt_gen(packet);
+
+			bytes = sendto(udp_sockfd, packet, PKTSIZ, 0, (struct sockaddr *) &clnt_addr,
+				clnt_len);
+			if (bytes < 0) {
 				fprintf(stderr, _RED_CLR"[System] "_DEF_CLR);
-				perror("pthread_create");
+				perror("sendto");
 				exit(EXIT_FAILURE);
 			}
 
-			printf(_BLUE_CLR"[Server]"_DEF_CLR" active clients: %d\n", ++nclients);
+			bytes = recvfrom(udp_sockfd, packet, PKTSIZ, 0, NULL, NULL);
+			if (bytes < 0) {
+				fprintf(stderr, _RED_CLR"[System] "_DEF_CLR);
+				perror("recvfrom");
+				exit(EXIT_FAILURE);
+			}
+
+			bytes = recvfrom(udp_sockfd, chkpkt, 1, 0, (struct sockaddr *) &clnt_addr,
+				(socklen_t *) &clnt_len);
+			if (bytes < 0) {
+				fprintf(stderr, _RED_CLR"[System] "_DEF_CLR);
+				perror("recvfrom");
+				exit(EXIT_FAILURE);
+			}
+
+			if (chkpkt[0] == 'q') {
+				--uclnts; --nclnts;
+				printf(_BLUE_CLR"[Server]"_DEF_CLR" active clients: %d\n", nclnts);
+				// also need 2 rm from udp_clients
+			}
+
 		}
 
 		if (cid == MAX_THREADS)
@@ -246,68 +274,23 @@ tcp_routine(void *_sfd)
 	return NULL;
 }
 
-void *
-udp_routine(void *_uti)
+int
+is_active_udp_client(unsigned short client)
 {
-	struct uti_t uti = *(struct uti_t *) _uti;
-	int _sockfd = uti.sockfd;
-	struct sockaddr_in _addr = uti.addr;
+	for (int i = 0; i < MAX_THREADS; ++i) {
+		if (udp_clients[i] == client)
+			return 1;
+	}
 
-	ssize_t bytes;
-
-	pthread_t this_thr = pthread_self();
-	printf(_RED_CLR"[System]"_DEF_CLR" thread created: 0x%lx\n", this_thr);
-
-//	while (0x1) {
-		char packet[PKTSIZ];
-
-		udp_pkt_gen(packet);
-
-		bytes = sendto(_sockfd, packet, PKTSIZ, 0, (struct sockaddr *) &_addr,
-			sizeof(_addr));
-		if (bytes < 0) {
-			fprintf(stderr, _RED_CLR"[System] "_DEF_CLR);
-			perror("sendto");
-			tp_push(&pool, this_thr);
-
-			if (pool.m_cursize > 0) {
-				printf(_RED_CLR"[System]"_DEF_CLR" current pool:\n");
-				for (int i = 0; i < pool.m_cursize; ++i)
-					printf("  [%d]: 0x%lx\n", i, (unsigned long) pool.m_threads[i]);
-			}
-
-			close(_sockfd);
-			free(_uti);
-			pthread_kill(this_thr, SIGUSR1);
-		}
-
-		bytes = recvfrom(_sockfd, packet, PKTSIZ, 0, NULL, NULL);
-		if (bytes < 0) {
-			fprintf(stderr, _RED_CLR"[System] "_DEF_CLR);
-			perror("recvfrom");
-			tp_push(&pool, this_thr);
-
-			if (pool.m_cursize > 0) {
-				printf(_RED_CLR"[System]"_DEF_CLR" current pool:\n");
-				for (int i = 0; i < pool.m_cursize; ++i)
-					printf("  [%d]: 0x%lx\n", i, (unsigned long) pool.m_threads[i]);
-			}
-
-			close(_sockfd);
-			free(_uti);
-			pthread_kill(this_thr, SIGUSR1);
-		}
-
-//		pthread_yield();
-//	}
-
-	return NULL;
+	return 0;
 }
 
 void
 killthr(void)
 {
-	printf(_BLUE_CLR"[Server]"_DEF_CLR" active clients: %d\n", --nclients);
+	--tclnts; --nclnts;
+
+	printf(_BLUE_CLR"[Server]"_DEF_CLR" active clients: %d\n", nclnts);
 
 	while (!tp_empty(&pool)) {
 		pthread_t thr = tp_pop(&pool);

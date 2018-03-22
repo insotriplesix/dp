@@ -5,7 +5,7 @@ static int sockfd;
 int
 main(int argc, char *argv[])
 {
-	int /*rc, */serv_len, connected;
+	int serv_len;
 	struct sockaddr_in serv_addr;
 	ssize_t bytes;
 
@@ -29,41 +29,54 @@ main(int argc, char *argv[])
 	serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
 	serv_addr.sin_port = htons(port);
 
-	connected = 0;
-
-	printf(_GREEN_CLR"[UDP Client]"_DEF_CLR" send packet to test the connection\n");
-
-	do {
-		bytes = sendto(sockfd, "q", 1, 0, (struct sockaddr *) &serv_addr, serv_len);
-		if (bytes >= 0)
-			connected = 1;
-		else {
-			printf(_GREEN_CLR"[UDP Client]"_DEF_CLR" connection refused...\n");
-			sleep(1);
-		}
-	} while (!connected);
-
-	printf(_GREEN_CLR"[UDP Client]"_DEF_CLR" connected!\n");
-
 	signal(SIGINT, (__sighandler_t) killproc);
 
-	while (0x1) {
+	srand((unsigned) time(NULL));
+
+	int npkts = 5 + rand() % 5;
+
+	printf(_GREEN_CLR"[UDP Client]"_DEF_CLR" connected! Trying to receive %d packets\n", npkts);
+
+	for (int i = 0; i < npkts; ++i) {
+		bytes = sendto(sockfd, "h", 1, 0, (struct sockaddr *) &serv_addr, serv_len);
+		if (bytes < 0) {
+			fprintf(stderr, _RED_CLR"[System] "_DEF_CLR);
+			perror("sendto");
+			exit(EXIT_FAILURE);
+		}
+
 		char packet[PKTSIZ];
 
 		bytes = recvfrom(sockfd, packet, PKTSIZ, 0, NULL, NULL);
 		if (bytes < 0) {
 			fprintf(stderr, _RED_CLR"[System] "_DEF_CLR);
-			perror("send");
+			perror("recvfrom");
 			exit(EXIT_FAILURE);
 		}
 
-		printf(_GREEN_CLR"[UDP Client]"_DEF_CLR" received packet: %s\n", packet);
+		printf(_GREEN_CLR"[UDP Client]"_DEF_CLR" received packet %2d: %s\n", i, packet);
 
 		bytes = sendto(sockfd, packet, PKTSIZ, 0, (struct sockaddr *) &serv_addr, serv_len);
 		if (bytes < 0) {
 			fprintf(stderr, _RED_CLR"[System] "_DEF_CLR);
-			perror("recv");
+			perror("sendto");
 			exit(EXIT_FAILURE);
+		}
+
+		if (i == npkts - 1) {
+			bytes = sendto(sockfd, "q", 1, 0, (struct sockaddr *) &serv_addr, serv_len);
+			if (bytes < 0) {
+				fprintf(stderr, _RED_CLR"[System] "_DEF_CLR);
+				perror("sendto");
+				exit(EXIT_FAILURE);
+			}
+		} else {
+			bytes = sendto(sockfd, "h", 1, 0, (struct sockaddr *) &serv_addr, serv_len);
+			if (bytes < 0) {
+				fprintf(stderr, _RED_CLR"[System] "_DEF_CLR);
+				perror("sendto");
+				exit(EXIT_FAILURE);
+			}
 		}
 
 		sleep(1);

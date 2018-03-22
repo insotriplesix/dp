@@ -36,6 +36,7 @@ int port;
 
 void *tcp_routine(void *_sfd);
 void *udp_routine(void *_uti);
+int is_active_udp_client(unsigned short client);
 void killthr(void);
 void __attribute__ ((noreturn)) killproc(void);
 void tcp_pkt_gen(char *pkt);
