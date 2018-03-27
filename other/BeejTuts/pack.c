@@ -35,7 +35,7 @@ ntohf(uint32_t p)
 int
 main(void)
 {
-	float f = 3.1415926, f2;
+	float f = 3.1415926, f2; // cannot be greater than 32767
 	uint32_t netf;
 
 	netf = htonf(f);	// convert to network form
