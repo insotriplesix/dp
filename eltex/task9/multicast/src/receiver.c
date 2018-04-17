@@ -26,6 +26,11 @@ main(int argc, char *argv[])
 			join = 1;
 			port = val;
 		}
+	} else if (argc == 3) {
+		int val1 = atoi(argv[1]);
+		int val2 = atoi(argv[2]);
+		port = val1;
+		join = val2;
 	} else {
 		fprintf(stderr, _RED_CLR"[System]"_DEF_CLR" usage: ./prog_name [<port>|<join(1/0)>]");
 		perror("socket");
