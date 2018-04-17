@@ -46,14 +46,7 @@ main(int argc, char *argv[])
 	signal(SIGINT, (__sighandler_t) killproc);
 
 	printf(_GREEN_CLR"[UDP Client]"_DEF_CLR" connected!\n");
-/*
-	bytes = sendto(udp_sockfd, "h", 1, 0, (struct sockaddr *) &serv_addr, serv_len);
-	if (bytes < 0) {
-		fprintf(stderr, _RED_CLR"[System] "_DEF_CLR);
-		perror("sendto");
-		exit(EXIT_FAILURE);
-	}
-*/
+
 	while (0x1) {
 		char packet[PKTSIZ];
 
