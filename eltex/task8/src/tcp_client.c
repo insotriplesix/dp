@@ -45,8 +45,6 @@ main(int argc, char *argv[])
 			}
 		} while (!connected);
 
-		printf(_YELLOW_CLR"[TCP Client]"_DEF_CLR" connected on port %d\n", port);
-
 		char packet[PKTSIZ];
 
 		bytes = recv(sockfd, packet, PKTSIZ, 0);
@@ -56,6 +54,14 @@ main(int argc, char *argv[])
 			exit(EXIT_FAILURE);
 		}
 
+		if (strncmp(packet, "TCP", 3) != 0) {
+			printf("%s", packet);
+			close(sockfd);
+			sleep(1);
+			continue;
+		}
+
+		printf(_YELLOW_CLR"[TCP Client]"_DEF_CLR" connected on port %d\n", port);
 		printf(_YELLOW_CLR"[TCP Client]"_DEF_CLR" check message: %s\n", packet);
 
 		char request[PKTSIZ] = "current_time";
@@ -80,10 +86,11 @@ main(int argc, char *argv[])
 
 		close(sockfd);
 
-		printf(_YELLOW_CLR"[TCP Client]"_DEF_CLR" disconnected\n");
+		int timeout = 3 + rand() % 5;
 
-		int r = 3 + rand() % 5;
-		sleep(r);
+		printf(_YELLOW_CLR"[TCP Client]"_DEF_CLR" waiting for %ds..\n", timeout);
+
+		sleep(timeout);
 	}
 
 	return 0;
@@ -93,6 +100,7 @@ void __attribute__ ((noreturn))
 killproc(void)
 {
 	close(sockfd);
+	printf(_YELLOW_CLR"[TCP Client]"_DEF_CLR" disconnected\n");
 	printf(_YELLOW_CLR"[TCP Client]"_DEF_CLR" quit\n");
 	exit(EXIT_SUCCESS);
 }

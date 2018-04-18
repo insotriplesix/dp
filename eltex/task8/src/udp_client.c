@@ -5,7 +5,7 @@ static int sockfd;
 int
 main(int argc, char *argv[])
 {
-	int serv_len;
+	int serv_len, ready;
 	struct sockaddr_in serv_addr;
 	ssize_t bytes;
 
@@ -38,7 +38,6 @@ main(int argc, char *argv[])
 		int npkts = 5 + rand() % 10;
 		char request[PKTSIZ];
 
-//		itoa(npkts, request, 10);
 		sprintf(request, "%d", npkts);
 
 		printf(_GREEN_CLR"[UDP Client]"_DEF_CLR" requesting for %d packets..\n", npkts);
@@ -50,12 +49,7 @@ main(int argc, char *argv[])
 			exit(EXIT_FAILURE);
 		}
 
-//		bytes = sendto(sockfd, request, PKTSIZ, 0, (struct sockaddr *) &serv_addr, serv_len);
-//		if (bytes < 0) {
-//			fprintf(stderr, _RED_CLR"[System] "_DEF_CLR);
-//			perror("sendto");
-//			exit(EXIT_FAILURE);
-//		}
+		ready = 1;
 
 		for (int i = 0; i < npkts; ++i) {
 			char packet[PKTSIZ];
@@ -67,6 +61,12 @@ main(int argc, char *argv[])
 				exit(EXIT_FAILURE);
 			}
 
+			if (strncmp(packet, "UDP", 3) != 0) {
+				printf("%s", packet);
+				ready = 0;
+				break;
+			}
+
 			printf(_GREEN_CLR"[UDP Client]"_DEF_CLR" received packet %2d: %s\n", i, packet);
 
 			sleep(1);
@@ -74,18 +74,17 @@ main(int argc, char *argv[])
 
 		close(sockfd);
 
-		printf(_GREEN_CLR"[UDP Client]"_DEF_CLR" waiting..\n");
-/*
-			bytes = sendto(sockfd, "q", 1, 0, (struct sockaddr *) &serv_addr, serv_len);
-			if (bytes < 0) {
-				fprintf(stderr, _RED_CLR"[System] "_DEF_CLR);
-				perror("sendto");
-				exit(EXIT_FAILURE);
-			}
-*/
-		int r = 13 + rand() % 7;
+		// server is busy, try again
+		if (!ready) {
+			sleep(1);
+			continue;
+		}
 
-		sleep(r);
+		int timeout = 13 + rand() % 7;
+
+		printf(_GREEN_CLR"[UDP Client]"_DEF_CLR" waiting for %ds..\n", timeout);
+
+		sleep(timeout);
 	}
 
 	return 0;

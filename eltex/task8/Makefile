@@ -1,6 +1,7 @@
 TCPCLNT := tcp_client
 UDPCLNT := udp_client
 SERV := server
+THPOOL := threadpool
 CC := gcc
 CFLAGS := -std=gnu99 -Wall -Wextra -g -pedantic -O2
 LDLIBS := -lpthread
@@ -22,7 +23,7 @@ $(UDPCLNT):
 	$(CC) $(CFLAGS) $(INCLUDES) $(SRCDIR)/$(UDPCLNT).c -o $(UDPCLNT)
 
 $(SERV):
-	$(CC) $(CFLAGS) $(INCLUDES) $(SRCDIR)/$(SERV).c $(LDLIBS) -o $(SERV)
+	$(CC) $(CFLAGS) $(INCLUDES) $(SRCDIR)/$(SERV).c $(SRCDIR)/$(THPOOL).c $(LDLIBS) -o $(SERV)
 
 clean:
 	rm -f $(EXECUTABLES)

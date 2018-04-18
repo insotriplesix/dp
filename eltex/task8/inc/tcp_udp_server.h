@@ -20,6 +20,7 @@
 
 #define PKTSIZ 64
 #define POOLSIZ 3
+#define MAX_LISTENERS 10
 
 #define _DEF_PORT 6666
 
@@ -32,9 +33,6 @@
 #define _MAGENTA_CLR "\033[1;35m"
 #define _CYAN_CLR "\033[1;36m"
 #define _WHITE_CLR "\033[1;37m"
-
-pthread_mutex_t pool_lock = PTHREAD_MUTEX_INITIALIZER;
-pthread_cond_t pool_cond = PTHREAD_COND_INITIALIZER;
 
 enum state_t {
 	INIT,
@@ -60,7 +58,7 @@ int server_state;
 void init(int argc, char *argv[]);
 void idle(int *nfds, struct epoll_event *efds);
 void response(int nfds, struct epoll_event *efds);
-void choose_worker(int sock);
+void choose_worker(int sock, struct sockaddr *clnt_addr, int clnt_len);
 
 void *tcp_routine(int _sfd);
 void *udp_routine(int _sfd);
