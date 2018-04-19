@@ -19,7 +19,6 @@
 #include <unistd.h>
 
 #define PKTSIZ 64
-#define POOLSIZ 3
 #define MAX_LISTENERS 10
 
 #define _DEF_PORT 6666
@@ -39,17 +38,6 @@ enum state_t {
 	IDLE,
 	RESPONSE,
 	ERROR
-};
-
-typedef void *(*CALLBACK)(int);
-
-struct worker_t {
-	short m_id;
-	int m_busy;
-	int m_val;	// sockfd for TCP, npkts for UDP
-	pthread_t m_thread;
-
-	CALLBACK m_job;
 };
 
 int port;

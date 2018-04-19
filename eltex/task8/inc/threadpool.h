@@ -3,6 +3,19 @@
 
 #include "tcp_udp_server.h"
 
+#define POOLSIZ 3
+
+typedef void *(*CALLBACK)(int);
+
+struct worker_t {
+	short m_id;
+	short m_busy;
+	int m_val;	// sockfd for TCP, npkts for UDP
+	pthread_t m_thread;
+
+	CALLBACK m_job;
+};
+
 struct threadpool_t {
 	int m_size;
 	pthread_mutex_t m_lock;

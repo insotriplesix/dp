@@ -2,7 +2,9 @@
 #include "tcp_udp_server.h"
 
 static int epollfd, tcp_sockfd, udp_sockfd, tcp_listenfd;
-static int /*tclnts, */uclnts, nclnts;
+static int uclnts, active_clients;
+
+pthread_mutex_t active_clients_lock = PTHREAD_MUTEX_INITIALIZER;
 
 static struct sockaddr_in udp_clients[POOLSIZ];
 
@@ -58,7 +60,8 @@ init(int argc, char *argv[])
 	struct sockaddr_in serv_addr;
 	struct epoll_event ev;
 
-	printf(_RED_CLR"[System]"_DEF_CLR" main thread: 0x%lx\n", pthread_self());
+	printf(_RED_CLR"[System]"_DEF_CLR" main thread: 0x%lx\n",
+		pthread_self());
 
 	if (argc < 2) {
 		port = _DEF_PORT;
@@ -156,7 +159,7 @@ init(int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 
-	tp_init(); // threadpool initializing
+	tp_init(); // threadpool init
 }
 
 void
@@ -172,8 +175,10 @@ idle(int *nfds, struct epoll_event *efds)
 			perror("epoll");
 			exit(EXIT_FAILURE);
 		} else if (*nfds == 0) {
-			printf(_BLUE_CLR"[Server]"_DEF_CLR" current time: %s", current_time());
-			printf(_BLUE_CLR"[Server]"_DEF_CLR" active clients: %d\n", nclnts);
+			printf(_BLUE_CLR"[Server]"_DEF_CLR" current time: %s",
+				current_time());
+			printf(_BLUE_CLR"[Server]"_DEF_CLR" active clients: %d\n",
+				active_clients);
 			if (pool.m_size > 0) {
 				printf(_RED_CLR"[System]"_DEF_CLR" pool state:\n");
 				for (int i = 0; i < pool.m_size; ++i) {
@@ -250,7 +255,6 @@ response(int nfds, struct epoll_event *efds)
 
 //				udp_clients[uclnts++] = ntohs(clnt_addr.sin_port);
 				udp_clients[0] = clnt_addr;
-//				++nclnts;
 			}
 
 			choose_worker(npkts, (struct sockaddr *) &clnt_addr, sizeof(clnt_addr));
@@ -273,7 +277,7 @@ choose_worker(int val, struct sockaddr *clnt_addr, int clnt_len)
 			pool.m_worker[i].m_val = val;
 			pool.m_worker[i].m_busy = 1;
 			done = 1;
-			++nclnts;
+			++active_clients;
 			break;
 		}
 	}
@@ -322,7 +326,8 @@ udp_routine(int _npkts)
 
 		udp_pkt_gen(packet);
 
-		bytes = sendto(udp_sockfd, packet, PKTSIZ, 0, (struct sockaddr *) &clnt_addr, clnt_len);
+		bytes = sendto(udp_sockfd, packet, PKTSIZ, 0, (struct sockaddr *) &clnt_addr,
+			clnt_len);
 		if (bytes < 0) {
 			fprintf(stderr, _RED_CLR"[System] "_DEF_CLR);
 			perror("sendto");
@@ -333,7 +338,10 @@ udp_routine(int _npkts)
 	sleep(5);
 	printf(_RED_CLR"[System]"_DEF_CLR" thread 0x%lx did the job\n", this_thr);
 
-	--uclnts; --nclnts;	// not threadsafe xd
+	pthread_mutex_lock(&active_clients_lock);
+	--uclnts;
+	--active_clients;
+	pthread_mutex_unlock(&active_clients_lock);
 
 	return NULL;
 }
@@ -381,7 +389,9 @@ tcp_routine(int _sfd)
 	sleep(5);
 	printf(_RED_CLR"[System]"_DEF_CLR" thread 0x%lx did the job\n", this_thr);
 
-	--nclnts;	// not threadsafe xd
+	pthread_mutex_lock(&active_clients_lock);
+	--active_clients;
+	pthread_mutex_unlock(&active_clients_lock);
 
 	return NULL;
 }
@@ -437,7 +447,11 @@ killproc(void)
 	close(tcp_sockfd);
 	close(udp_sockfd);
 	close(epollfd);
+
+	pthread_mutex_destroy(&active_clients_lock);
+
 	printf(_BLUE_CLR"[Server]"_DEF_CLR" quit\n");
+
 	exit(EXIT_SUCCESS);
 }
 
