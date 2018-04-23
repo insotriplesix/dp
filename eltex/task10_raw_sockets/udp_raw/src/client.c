@@ -32,7 +32,7 @@ main(void)
 	srand((unsigned) time(NULL));
 
 	while (0x1) {
-		char *send_pkt = malloc(sizeof(char) * PKTSIZ);
+		char *send_pkt = calloc(PKTSIZ, sizeof(char));
 
 		pktgen(send_pkt);
 
@@ -45,7 +45,7 @@ main(void)
 		}
 
 		printf(_GREEN_CLR"[UDP Client]"_DEF_CLR" send: ");
-		print_udphdr((struct udphdr *) send_pkt);
+		print_udphdr((struct udphdr *) (send_pkt));
 		printf(_LMAGENTA_CLR"%s "_LBLUE_CLR"%d%d%d%d"_DEF_CLR
 			" (%zu bytes)\n", send_pkt + UDP_HDRSZ,
 			(int) send_pkt[UDP_HDRSZ + DATASIZ],
@@ -67,7 +67,7 @@ main(void)
 		}
 
 		printf(_GREEN_CLR"[UDP Client]"_DEF_CLR" recv: ");
-		print_udphdr((struct udphdr *) recv_pkt + IP_HDRSZ);
+		print_udphdr((struct udphdr *) (recv_pkt + IP_HDRSZ));
 		printf(_LMAGENTA_CLR"%s "_LBLUE_CLR"%d%d%d%d"_DEF_CLR
 			" (%zu bytes)\n", recv_pkt + HDRSIZ,
 			(int) recv_pkt[HDRSIZ + DATASIZ],
@@ -107,7 +107,7 @@ pktgen(char *pkt)
 
 	hdr->uh_sport = htons(port_clnt);
 	hdr->uh_dport = htons(port_serv);
-	hdr->uh_ulen = htons(PKTSIZ);
+	hdr->uh_ulen = htons(PKTSIZ - IP_HDRSZ);
 	hdr->uh_sum = htons(0x0);
 
 	/* Datagen */
@@ -123,7 +123,7 @@ pktgen(char *pkt)
 
 	data[i] = '\0';
 
-	memcpy(pkt, hdr, UDP_HDRSZ);
+//	memcpy(pkt, hdr, UDP_HDRSZ);
 	memcpy(pkt + UDP_HDRSZ, data, DATASIZ);
 	memset(pkt + UDP_HDRSZ + DATASIZ, 0, PADDING);
 }
