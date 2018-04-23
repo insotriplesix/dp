@@ -1,5 +1,7 @@
 #include "udp_echo_server.h"
 
+#define SERV_ADDR "127.0.0.1"
+
 static int udp_sockfd;
 
 int
@@ -25,7 +27,7 @@ main(void)
 
 	memset((char *) &serv_addr, 0, serv_len);
 	serv_addr.sin_family = AF_INET;
-	serv_addr.sin_addr.s_addr = inet_addr("192.168.0.100");
+	serv_addr.sin_addr.s_addr = inet_addr(SERV_ADDR);
 	serv_addr.sin_port = htons(port_serv);
 
 	int hdrincl = 1;
@@ -55,8 +57,8 @@ main(void)
 		}
 
 		printf(_GREEN_CLR"[UDP Client]"_DEF_CLR" send: ");
-		print_iphdr((struct iphdr *) send_pkt);
-		print_udphdr((struct udphdr *) send_pkt + IP_HDRSZ);
+//		print_iphdr((struct iphdr *) send_pkt);
+		print_udphdr((struct udphdr *) (send_pkt + IP_HDRSZ));
 		printf(_LMAGENTA_CLR"%s "_LBLUE_CLR"%d%d%d%d"_DEF_CLR
 			" (%zu bytes)\n", send_pkt + HDRSIZ,
 			(int) send_pkt[HDRSIZ + DATASIZ],
@@ -78,8 +80,8 @@ main(void)
 		}
 
 		printf(_GREEN_CLR"[UDP Client]"_DEF_CLR" recv: ");
-		print_iphdr((struct iphdr *) recv_pkt);
-		print_udphdr((struct udphdr *) recv_pkt + IP_HDRSZ);
+//		print_iphdr((struct iphdr *) recv_pkt);
+		print_udphdr((struct udphdr *) (recv_pkt + IP_HDRSZ));
 		printf(_LMAGENTA_CLR"%s "_LBLUE_CLR"%d%d%d%d"_DEF_CLR
 			" (%zu bytes)\n", recv_pkt + HDRSIZ,
 			(int) recv_pkt[HDRSIZ + DATASIZ],
@@ -117,42 +119,40 @@ pktgen(char *pkt)
 
 	struct iphdr *iph = (struct iphdr *) pkt;
 
-	iph->ihl = sizeof(struct iphdr) / sizeof(uint32_t);
 	iph->version = 4;
+	iph->ihl = sizeof(struct iphdr) / sizeof(uint32_t);
 	iph->tos = 0;
-	iph->tot_len = PKTSIZ;
-	iph->id = 0;
+	iph->tot_len = 0;
+	iph->id = htons(0x666);
 	iph->frag_off = 0;
-	iph->ttl = 64;
+	iph->ttl = 0x40;
 	iph->protocol = IPPROTO_UDP;
-	iph->check = 0;
-	iph->saddr = 0;
-	iph->daddr = inet_addr("192.168.0.100");
+	iph->check = htons(0x0);
+	iph->saddr = htonl(INADDR_ANY);
+	iph->daddr = inet_addr(SERV_ADDR);
 
 	/* UDP header init */
 
-	struct udphdr *udph = (struct udphdr *) pkt + IP_HDRSZ;
+	struct udphdr *udph = (struct udphdr *) (pkt + IP_HDRSZ);
 
 	udph->uh_sport = htons(port_clnt);
 	udph->uh_dport = htons(port_serv);
-	udph->uh_ulen = htons(PKTSIZ);
+	udph->uh_ulen = htons(PKTSIZ - IP_HDRSZ);
 	udph->uh_sum = htons(0x0);
 
 	/* Datagen */
 
 	char data[DATASIZ];
 
-    int start = (int)' ';
-    int end = (int)'~';
-    int i = 0;
+	int start = (int)' ';
+	int end = (int)'~';
+	int i = 0;
 
-    for (; i < DATASIZ - 1; ++i)
-        data[i] = (char)(start + rand() % (end - start));
+	for (; i < DATASIZ - 1; ++i)
+		data[i] = (char)(start + rand() % (end - start));
 
-    data[i] = '\0';
+	data[i] = '\0';
 
-	memcpy(pkt, iph, IP_HDRSZ);
-	memcpy(pkt + IP_HDRSZ, udph, UDP_HDRSZ);
 	memcpy(pkt + HDRSIZ, data, DATASIZ);
 	memset(pkt + HDRSIZ + DATASIZ, 0, PADDING);
 }

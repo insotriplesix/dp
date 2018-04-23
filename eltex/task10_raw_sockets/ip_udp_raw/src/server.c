@@ -25,7 +25,7 @@ main(void)
 
 	memset((char *) &serv_addr, 0, serv_len);
 	serv_addr.sin_family = AF_INET;
-	serv_addr.sin_addr.s_addr = inet_addr("192.168.0.100");
+	serv_addr.sin_addr.s_addr = INADDR_ANY;
 	serv_addr.sin_port = htons(port_serv);
 
 	rc = bind(udp_sockfd, (struct sockaddr *) &serv_addr, serv_len);
@@ -48,8 +48,8 @@ main(void)
 			exit(EXIT_FAILURE);
 		}
 
-		printf(_BLUE_CLR"[Server]"_DEF_CLR" got %zu bytes, send them back\n",
-			bytes);
+		printf(_BLUE_CLR"[Server]"_DEF_CLR" got %zu (+ %zu + %zu) bytes"
+			", send them back\n", bytes, UDP_HDRSZ, IP_HDRSZ);
 
 		bytes = sendto(udp_sockfd, packet, PKTSIZ, 0,
 			(struct sockaddr *) &clnt_addr, clnt_len);

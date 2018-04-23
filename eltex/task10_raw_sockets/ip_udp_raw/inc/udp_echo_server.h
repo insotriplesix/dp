@@ -28,7 +28,7 @@
 #define PADDING 4
 #define PKTSIZ (HDRSIZ + DATASIZ + PADDING)
 #define _DEF_PORT_CLNT 9696
-#define _DEF_PORT_SERV 9969
+#define _DEF_PORT_SERV 6969
 
 #define _DEF_CLR "\033[0m"
 #define _BLACK_CLR "\033[1;30m"
@@ -52,10 +52,10 @@ uint16_t checksum(uint16_t *addr, int len);
 inline void __attribute__ ((always_inline))
 print_iphdr(struct iphdr *hdr)
 {
-    printf(_LCYAN_CLR"%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u "_DEF_CLR,
-		hdr->ihl, hdr->version, hdr->tos, hdr->tot_len,
-		hdr->id, hdr->frag_off, hdr->ttl, hdr->protocol,
-		hdr->check, hdr->saddr, hdr->daddr);
+    printf(_LCYAN_CLR"%u,%u,%u,%hu,%hu,%hu,%u,%u,%hu,%u,%u "_DEF_CLR,
+		hdr->ihl, hdr->version, hdr->tos, ntohs(hdr->tot_len),
+		ntohs(hdr->id), ntohs(hdr->frag_off), hdr->ttl, hdr->protocol,
+		ntohs(hdr->check), hdr->saddr, hdr->daddr);
 }
 
 inline void __attribute__ ((always_inline))
