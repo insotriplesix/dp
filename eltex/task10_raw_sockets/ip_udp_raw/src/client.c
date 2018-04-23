@@ -44,7 +44,7 @@ main(void)
 	srand((unsigned) time(NULL));
 
 	while (0x1) {
-		char *send_pkt = malloc(sizeof(char) * PKTSIZ);
+		char *send_pkt = calloc(PKTSIZ, sizeof(char));
 
 		pktgen(send_pkt);
 
