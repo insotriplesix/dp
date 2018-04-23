@@ -16,7 +16,7 @@ main(void)
 	printf(_RED_CLR"[System]"_DEF_CLR" using default port: %d\n",
 		port_serv);
 
-	udp_sockfd = socket(AF_INET, SOCK_RAW, IPPROTO_UDP);
+	udp_sockfd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 	if (udp_sockfd < 0) {
 		fprintf(stderr, _RED_CLR"[System] "_DEF_CLR);
 		perror("udp socket");
@@ -34,8 +34,6 @@ main(void)
 		perror("bind");
 		exit(EXIT_FAILURE);
 	}
-
-	printf(_BLUE_CLR"[Server]"_DEF_CLR" port: %d\n", ntohs(serv_addr.sin_port));
 
 	signal(SIGINT, (__sighandler_t) killproc);
 
@@ -60,12 +58,6 @@ main(void)
 			perror("sendto");
 			exit(EXIT_FAILURE);
 		}
-
-		printf(" > ");
-		print_udphdr((struct udphdr *) packet);
-		printf("%s sent\n", packet + UDP_HDRSZ);
-
-		sleep(2);
 	}
 
 	return 0;

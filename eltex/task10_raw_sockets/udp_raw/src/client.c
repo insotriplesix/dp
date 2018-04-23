@@ -29,9 +29,10 @@ main(void)
 	serv_addr.sin_port = htons(port_serv);
 
 	signal(SIGINT, (__sighandler_t) killproc);
+	srand((unsigned) time(NULL));
 
 	while (0x1) {
-		char send_pkt[PKTSIZ], recv_pkt[PKTSIZ];
+		char *send_pkt = malloc(sizeof(char) * PKTSIZ);
 
 		pktgen(send_pkt);
 
@@ -45,21 +46,43 @@ main(void)
 
 		printf(_GREEN_CLR"[UDP Client]"_DEF_CLR" send: ");
 		print_udphdr((struct udphdr *) send_pkt);
-		printf("%s (%zu bytes)\n", send_pkt + UDP_HDRSZ, bytes);
+		printf(_LMAGENTA_CLR"%s "_LBLUE_CLR"%d%d%d%d"_DEF_CLR
+			" (%zu bytes)\n", send_pkt + UDP_HDRSZ,
+			(int) send_pkt[UDP_HDRSZ + DATASIZ],
+			(int) send_pkt[UDP_HDRSZ + DATASIZ + 1],
+			(int) send_pkt[UDP_HDRSZ + DATASIZ + 2],
+			(int) send_pkt[UDP_HDRSZ + DATASIZ + 3],
+			bytes);
 
-		bytes = recvfrom(udp_sockfd, recv_pkt, PKTSIZ, 0, NULL, NULL);
-		if (bytes < 0) {
-			fprintf(stderr, _RED_CLR"[System] "_DEF_CLR);
-			perror("recvfrom");
-			exit(EXIT_FAILURE);
+		char *recv_pkt = malloc(sizeof(char) * PKTSIZ);
+
+		// skip 1 recv from itself
+		for (int i = 0; i < 2; ++i) {
+			bytes = recvfrom(udp_sockfd, recv_pkt, PKTSIZ, 0, NULL, NULL);
+			if (bytes < 0) {
+				fprintf(stderr, _RED_CLR"[System] "_DEF_CLR);
+				perror("recvfrom");
+				exit(EXIT_FAILURE);
+			}
 		}
 
 		printf(_GREEN_CLR"[UDP Client]"_DEF_CLR" recv: ");
-		print_udphdr((struct udphdr *) recv_pkt);
-		printf("%s (%zu bytes)\n", recv_pkt + UDP_HDRSZ, bytes);
+		print_udphdr((struct udphdr *) recv_pkt + IP_HDRSZ);
+		printf(_LMAGENTA_CLR"%s "_LBLUE_CLR"%d%d%d%d"_DEF_CLR
+			" (%zu bytes)\n", recv_pkt + HDRSIZ,
+			(int) recv_pkt[HDRSIZ + DATASIZ],
+			(int) recv_pkt[HDRSIZ + DATASIZ + 1],
+			(int) recv_pkt[HDRSIZ + DATASIZ + 2],
+			(int) recv_pkt[HDRSIZ + DATASIZ + 3],
+			bytes);
 
-		printf("    %s\n", strcmp(send_pkt, recv_pkt) ?
-			_RED_CLR"wrong"_DEF_CLR : _GREEN_CLR"correct"_DEF_CLR);
+		printf("    %s\n", strncmp(send_pkt + UDP_HDRSZ,
+			recv_pkt + HDRSIZ, DATASIZ)
+			? _RED_CLR"wrong"_DEF_CLR
+			: _GREEN_CLR"correct"_DEF_CLR);
+
+		free(send_pkt);
+		free(recv_pkt);
 
 		sleep(2);
 	}
@@ -80,12 +103,12 @@ pktgen(char *pkt)
 {
 	/* UDP header init */
 
-	struct udphdr *hdr = malloc(sizeof(struct udphdr));
+	struct udphdr *hdr = (struct udphdr *) pkt;
 
 	hdr->uh_sport = htons(port_clnt);
 	hdr->uh_dport = htons(port_serv);
-	hdr->uh_ulen = UDP_HDRSZ;
-	hdr->uh_sum = 0x0;
+	hdr->uh_ulen = htons(PKTSIZ);
+	hdr->uh_sum = htons(0x0);
 
 	/* Datagen */
 
@@ -102,4 +125,5 @@ pktgen(char *pkt)
 
 	memcpy(pkt, hdr, UDP_HDRSZ);
 	memcpy(pkt + UDP_HDRSZ, data, DATASIZ);
+	memset(pkt + UDP_HDRSZ + DATASIZ, 0, PADDING);
 }

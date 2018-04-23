@@ -3,6 +3,7 @@
 #define __UDP_ECHO_SERVER_H__
 
 #include <arpa/inet.h>
+#include <ctype.h>
 #include <netdb.h>
 #include <netinet/in.h>
 #include <netinet/ip.h>
@@ -20,10 +21,12 @@
 #include <time.h>
 #include <unistd.h>
 
-#define IP_HDRSZ sizeof(struct ip)
+#define IP_HDRSZ sizeof(struct iphdr)
 #define UDP_HDRSZ sizeof(struct udphdr)
+#define HDRSIZ (IP_HDRSZ + UDP_HDRSZ)
 #define DATASIZ 32
-#define PKTSIZ (IP_HDRSZ + UDP_HDRSZ + DATASIZ)
+#define PADDING 4
+#define PKTSIZ (HDRSIZ + DATASIZ + PADDING)
 #define _DEF_PORT_CLNT 9696
 #define _DEF_PORT_SERV 6969
 
@@ -33,12 +36,14 @@
 #define _GREEN_CLR "\033[1;32m"
 #define _YELLOW_CLR "\033[1;33m"
 #define _BLUE_CLR "\033[1;34m"
+#define _LBLUE_CLR "\033[0;34m"
 #define _MAGENTA_CLR "\033[1;35m"
+#define _LMAGENTA_CLR "\033[0;35m"
 #define _CYAN_CLR "\033[1;36m"
 #define _LCYAN_CLR "\033[0;36m"
 #define _WHITE_CLR "\033[1;37m"
 
-int port_clnt, port_serv;
+unsigned short port_clnt, port_serv;
 
 void __attribute__ ((noreturn)) killproc(void);
 void pktgen(char *pkt);
@@ -48,7 +53,7 @@ print_udphdr(struct udphdr *hdr)
 {
     printf(_LCYAN_CLR"%hu,%hu,%hu,%hu "_DEF_CLR,
         ntohs(hdr->uh_sport), ntohs(hdr->uh_dport),
-		hdr->uh_ulen, hdr->uh_sum);
+		ntohs(hdr->uh_ulen), ntohs(hdr->uh_sum));
 }
 
 #endif
