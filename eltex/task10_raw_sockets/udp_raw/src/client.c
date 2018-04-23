@@ -114,14 +114,14 @@ pktgen(char *pkt)
 
 	char data[DATASIZ];
 
-    int start = (int)' ';
-    int end = (int)'~';
-    int i = 0;
+	int start = (int)' ';
+	int end = (int)'~';
+	int i = 0;
 
-    for (; i < DATASIZ - 1; ++i)
-        data[i] = (char)(start + rand() % (end - start));
+	for (; i < DATASIZ - 1; ++i)
+		data[i] = (char)(start + rand() % (end - start));
 
-    data[i] = '\0';
+	data[i] = '\0';
 
 	memcpy(pkt, hdr, UDP_HDRSZ);
 	memcpy(pkt + UDP_HDRSZ, data, DATASIZ);

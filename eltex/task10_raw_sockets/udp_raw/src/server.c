@@ -48,8 +48,8 @@ main(void)
 			exit(EXIT_FAILURE);
 		}
 
-		printf(_BLUE_CLR"[Server]"_DEF_CLR" got %zu bytes, send them back\n",
-			bytes);
+		printf(_BLUE_CLR"[Server]"_DEF_CLR" got %zu (+ %zu) bytes, send them back\n",
+			bytes, UDP_HDRSZ);
 
 		bytes = sendto(udp_sockfd, packet, PKTSIZ, 0,
 			(struct sockaddr *) &clnt_addr, clnt_len);
