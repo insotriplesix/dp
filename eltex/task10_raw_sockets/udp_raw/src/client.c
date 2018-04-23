@@ -54,7 +54,7 @@ main(void)
 			(int) send_pkt[UDP_HDRSZ + DATASIZ + 3],
 			bytes);
 
-		char *recv_pkt = malloc(sizeof(char) * PKTSIZ);
+		char *recv_pkt = calloc(PKTSIZ, sizeof(char));
 
 		// skip 1 recv from itself
 		for (int i = 0; i < 2; ++i) {
