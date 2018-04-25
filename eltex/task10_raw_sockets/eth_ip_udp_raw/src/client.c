@@ -17,7 +17,7 @@ int
 main(void)
 {
 	int serv_len, rc;
-	struct sockaddr_in serv_addr;
+	struct sockaddr_ll serv_addr;
 	ssize_t bytes;
 
 	serv_len = sizeof(serv_addr);
@@ -27,7 +27,7 @@ main(void)
 	printf(_RED_CLR"[System]"_DEF_CLR" using default port: %d\n",
 		port_clnt);
 
-	udp_sockfd = socket(AF_PACKET, SOCK_RAW, IPPROTO_RAW);
+	udp_sockfd = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_ALL));
 	if (udp_sockfd < 0) {
 		fprintf(stderr, _RED_CLR"[System] "_DEF_CLR);
 		perror("socket");
@@ -35,9 +35,14 @@ main(void)
 	}
 
 	memset((char *) &serv_addr, 0, serv_len);
-	serv_addr.sin_family = AF_INET;
-	serv_addr.sin_addr.s_addr = inet_addr(SERV_ADDR);
-	serv_addr.sin_port = htons(port_serv);
+	serv_addr.sll_family = AF_PACKET;
+	serv_addr.sll_protocol = htons(ETH_P_ALL);
+	serv_addr.sll_addr[0] = MAC0;
+	serv_addr.sll_addr[1] = MAC1;
+	serv_addr.sll_addr[2] = MAC2;
+	serv_addr.sll_addr[3] = MAC3;
+	serv_addr.sll_addr[4] = MAC4;
+	serv_addr.sll_addr[5] = MAC5;
 
 	int hdrincl = 1;
 
