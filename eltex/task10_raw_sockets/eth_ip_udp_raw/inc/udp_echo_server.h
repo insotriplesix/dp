@@ -29,7 +29,7 @@
 #define IP_HDRSZ sizeof(struct iphdr)
 #define UDP_HDRSZ sizeof(struct udphdr)
 #define HDRSIZ (ETH_HDRSZ + IP_HDRSZ + UDP_HDRSZ)
-#define DATASIZ 32
+#define DATASIZ 18
 #define PADDING 4
 #define PKTSIZ (HDRSIZ + DATASIZ + PADDING)
 #define _DEF_PORT_CLNT 9696

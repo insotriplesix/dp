@@ -7,9 +7,9 @@
 #define MAC4 0x66
 #define MAC5 0x66
 
-#define IF_NAME "eth0"
-#define CLI_ADDR "192.168.0.102"
-#define SERV_ADDR "192.168.0.100"
+#define IF_NAME "enp5s0"
+#define CLI_ADDR "192.168.0.100"
+#define SERV_ADDR "192.168.0.102"
 
 static int udp_sockfd;
 
@@ -34,26 +34,30 @@ main(void)
 		exit(EXIT_FAILURE);
 	}
 
+	struct ifreq ifreq_i;
+
+	memset((char *) &ifreq_i, 0, sizeof(ifreq_i));
+	strncpy(ifreq_i.ifr_name, IF_NAME, IFNAMSIZ - 1);
+
+	rc = ioctl(udp_sockfd, SIOCGIFINDEX, &ifreq_i);
+	if (rc < 0) {
+		fprintf(stderr, _RED_CLR"[System] "_DEF_CLR);
+		perror("ioctl index");
+		exit(EXIT_FAILURE);
+	}
+
 	memset((char *) &serv_addr, 0, serv_len);
 	serv_addr.sll_family = AF_PACKET;
-	serv_addr.sll_protocol = htons(ETH_P_ALL);
+	serv_addr.sll_protocol = htons(ETH_P_IP);
+	serv_addr.sll_ifindex = ifreq_i.ifr_ifindex;
+	serv_addr.sll_halen = ETH_ALEN;
 	serv_addr.sll_addr[0] = MAC0;
 	serv_addr.sll_addr[1] = MAC1;
 	serv_addr.sll_addr[2] = MAC2;
 	serv_addr.sll_addr[3] = MAC3;
 	serv_addr.sll_addr[4] = MAC4;
 	serv_addr.sll_addr[5] = MAC5;
-/*
-	int hdrincl = 1;
 
-	// tell kernel not to generate ip header
-	rc = setsockopt(udp_sockfd, IPPROTO_IP, IP_HDRINCL, &hdrincl, sizeof(hdrincl));
-	if (rc < 0) {
-		fprintf(stderr, _RED_CLR"[System] "_DEF_CLR);
-		perror("setsockopt");
-		exit(EXIT_FAILURE);
-	}
-*/
 	signal(SIGINT, (__sighandler_t) killproc);
 	srand((unsigned) time(NULL));
 
@@ -71,7 +75,6 @@ main(void)
 		}
 
 		printf(_GREEN_CLR"[UDP Client]"_DEF_CLR" send: ");
-//		print_iphdr((struct iphdr *) send_pkt);
 		print_udphdr((struct udphdr *) (send_pkt + ETH_HDRSZ + IP_HDRSZ));
 		printf(_LMAGENTA_CLR"%s "_LBLUE_CLR"%d%d%d%d"_DEF_CLR
 			" (%zu bytes)\n", send_pkt + HDRSIZ,
@@ -94,7 +97,6 @@ main(void)
 		}
 
 		printf(_GREEN_CLR"[UDP Client]"_DEF_CLR" recv: ");
-//		print_iphdr((struct iphdr *) recv_pkt);
 		print_udphdr((struct udphdr *) (recv_pkt + ETH_HDRSZ + IP_HDRSZ));
 		printf(_LMAGENTA_CLR"%s "_LBLUE_CLR"%d%d%d%d"_DEF_CLR
 			" (%zu bytes)\n", recv_pkt + HDRSIZ,
@@ -133,12 +135,12 @@ pktgen(char *pkt)
 
 	/* ETH header init */
 
-	struct ifreq _ifreq;
+	struct ifreq ifreq_hwa;
 
-	memset((char *) &_ifreq, 0, sizeof(_ifreq));
-	strncpy(_ifreq.ifr_name, IF_NAME, IFNAMSIZ - 1);
+	memset((char *) &ifreq_hwa, 0, sizeof(ifreq_hwa));
+	strncpy(ifreq_hwa.ifr_name, IF_NAME, IFNAMSIZ - 1);
 
-	rc = ioctl(udp_sockfd, SIOCGIFHWADDR, &_ifreq);
+	rc = ioctl(udp_sockfd, SIOCGIFHWADDR, &ifreq_hwa);
 	if (rc < 0) {
 		fprintf(stderr, _RED_CLR"[System] "_DEF_CLR);
 		perror("ioctl hwaddr");
@@ -147,12 +149,12 @@ pktgen(char *pkt)
 
 	struct ethhdr *ethh = (struct ethhdr *) pkt;
 
-	ethh->h_source[0] = (unsigned char)(_ifreq.ifr_hwaddr.sa_data[0]);
-	ethh->h_source[1] = (unsigned char)(_ifreq.ifr_hwaddr.sa_data[1]);
-	ethh->h_source[2] = (unsigned char)(_ifreq.ifr_hwaddr.sa_data[2]);
-	ethh->h_source[3] = (unsigned char)(_ifreq.ifr_hwaddr.sa_data[3]);
-	ethh->h_source[4] = (unsigned char)(_ifreq.ifr_hwaddr.sa_data[4]);
-	ethh->h_source[5] = (unsigned char)(_ifreq.ifr_hwaddr.sa_data[5]);
+	ethh->h_source[0] = (unsigned char)(ifreq_hwa.ifr_hwaddr.sa_data[0]);
+	ethh->h_source[1] = (unsigned char)(ifreq_hwa.ifr_hwaddr.sa_data[1]);
+	ethh->h_source[2] = (unsigned char)(ifreq_hwa.ifr_hwaddr.sa_data[2]);
+	ethh->h_source[3] = (unsigned char)(ifreq_hwa.ifr_hwaddr.sa_data[3]);
+	ethh->h_source[4] = (unsigned char)(ifreq_hwa.ifr_hwaddr.sa_data[4]);
+	ethh->h_source[5] = (unsigned char)(ifreq_hwa.ifr_hwaddr.sa_data[5]);
 
 	ethh->h_dest[0] = MAC0;
 	ethh->h_dest[1] = MAC1;
@@ -185,7 +187,7 @@ pktgen(char *pkt)
 
 	udph->uh_sport = htons(port_clnt);
 	udph->uh_dport = htons(port_serv);
-	udph->uh_ulen = htons(PKTSIZ - IP_HDRSZ);
+	udph->uh_ulen = htons(PKTSIZ - ETH_HDRSZ - IP_HDRSZ);
 	udph->uh_sum = htons(0x0);
 
 	/* Datagen */
