@@ -27,7 +27,7 @@ main(void)
 	printf(_RED_CLR"[System]"_DEF_CLR" using default port: %d\n",
 		port_clnt);
 
-	udp_sockfd = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_ALL));
+	udp_sockfd = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_IP));
 	if (udp_sockfd < 0) {
 		fprintf(stderr, _RED_CLR"[System] "_DEF_CLR);
 		perror("socket");
@@ -43,7 +43,7 @@ main(void)
 	serv_addr.sll_addr[3] = MAC3;
 	serv_addr.sll_addr[4] = MAC4;
 	serv_addr.sll_addr[5] = MAC5;
-
+/*
 	int hdrincl = 1;
 
 	// tell kernel not to generate ip header
@@ -53,7 +53,7 @@ main(void)
 		perror("setsockopt");
 		exit(EXIT_FAILURE);
 	}
-
+*/
 	signal(SIGINT, (__sighandler_t) killproc);
 	srand((unsigned) time(NULL));
 
@@ -136,7 +136,7 @@ pktgen(char *pkt)
 	struct ifreq _ifreq;
 
 	memset((char *) &_ifreq, 0, sizeof(_ifreq));
-	memcpy(_ifreq.ifr_name, IF_NAME, IFNAMSIZ - 1);
+	strncpy(_ifreq.ifr_name, IF_NAME, IFNAMSIZ - 1);
 
 	rc = ioctl(udp_sockfd, SIOCGIFHWADDR, &_ifreq);
 	if (rc < 0) {
@@ -161,7 +161,7 @@ pktgen(char *pkt)
 	ethh->h_dest[4] = MAC4;
 	ethh->h_dest[5] = MAC5;
 
-	ethh->h_proto = IPPROTO_IP;
+	ethh->h_proto = htons(ETH_P_IP);
 
 	/* IP header init */
 
