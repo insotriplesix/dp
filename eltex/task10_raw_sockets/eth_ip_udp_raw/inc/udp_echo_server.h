@@ -29,9 +29,8 @@
 #define IP_HDRSZ sizeof(struct iphdr)
 #define UDP_HDRSZ sizeof(struct udphdr)
 #define HDRSIZ (ETH_HDRSZ + IP_HDRSZ + UDP_HDRSZ)
-#define DATASIZ 18
-#define PADDING 4
-#define PKTSIZ (HDRSIZ + DATASIZ + PADDING)
+#define DATASIZ 64 - HDRSIZ
+#define PKTSIZ (HDRSIZ + DATASIZ)
 #define _DEF_PORT_CLNT 9696
 #define _DEF_PORT_SERV 6969
 
@@ -52,13 +51,13 @@ unsigned short port_clnt, port_serv;
 
 void __attribute__ ((noreturn)) killproc(void);
 void pktgen(char *pkt);
-uint16_t checksum(uint16_t *addr, int len);
+uint16_t ipv4_checksum(uint16_t *addr, int count);
 
 inline void __attribute__ ((always_inline))
 print_ethhdr(struct ethhdr *hdr)
 {
     printf(_LCYAN_CLR"%.2X:%.2X:%.2X:%.2X:%.2X:%.2x,"
-		"%.2X:%.2X:%.2X:%.2X:%.2X:%.2x,%d"_DEF_CLR,
+		"%.2X:%.2X:%.2X:%.2X:%.2X:%.2X,%d "_DEF_CLR,
 		hdr->h_source[0], hdr->h_source[1], hdr->h_source[2],
 		hdr->h_source[3], hdr->h_source[4], hdr->h_source[5],
 		hdr->h_dest[0], hdr->h_dest[1], hdr->h_dest[2],

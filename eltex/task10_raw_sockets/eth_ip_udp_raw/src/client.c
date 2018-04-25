@@ -1,5 +1,7 @@
 #include "udp_echo_server.h"
 
+/* Remote PC HWADDR */
+
 #define MAC0 0x66
 #define MAC1 0x66
 #define MAC2 0x66
@@ -7,7 +9,10 @@
 #define MAC4 0x66
 #define MAC5 0x66
 
+/* Interface name */
+
 #define IF_NAME "enp5s0"
+
 #define CLI_ADDR "192.168.0.100"
 #define SERV_ADDR "192.168.0.102"
 
@@ -75,36 +80,34 @@ main(void)
 		}
 
 		printf(_GREEN_CLR"[UDP Client]"_DEF_CLR" send: ");
-		print_udphdr((struct udphdr *) (send_pkt + ETH_HDRSZ + IP_HDRSZ));
-		printf(_LMAGENTA_CLR"%s "_LBLUE_CLR"%d%d%d%d"_DEF_CLR
-			" (%zu bytes)\n", send_pkt + HDRSIZ,
-			(int) send_pkt[HDRSIZ + DATASIZ],
-			(int) send_pkt[HDRSIZ + DATASIZ + 1],
-			(int) send_pkt[HDRSIZ + DATASIZ + 2],
-			(int) send_pkt[HDRSIZ + DATASIZ + 3],
-			bytes);
+		print_ethhdr((struct ethhdr *) (send_pkt));
+//		print_iphdr((struct iphdr *) (send_pkt + ETH_HDRSZ));
+//		print_udphdr((struct udphdr *) (send_pkt + ETH_HDRSZ + IP_HDRSZ));
+		printf(_LMAGENTA_CLR"%s \t"_DEF_CLR"(%zu bytes)\n", send_pkt + HDRSIZ, bytes);
 
 		char *recv_pkt = calloc(PKTSIZ, sizeof(char));
 
-		// skip 1 recv from itself
-		for (int i = 0; i < 2; ++i) {
+		// skip packets that came to other ports
+		while (0x1) {
 			bytes = recvfrom(udp_sockfd, recv_pkt, PKTSIZ, 0, NULL, NULL);
 			if (bytes < 0) {
 				fprintf(stderr, _RED_CLR"[System] "_DEF_CLR);
 				perror("recvfrom");
 				exit(EXIT_FAILURE);
 			}
+
+			struct udphdr *hdr = (struct udphdr *) (recv_pkt + ETH_HDRSZ + IP_HDRSZ);
+
+			// if it`s our packet -- print it
+			if (ntohs(hdr->uh_dport) == port_clnt)
+				break;
 		}
 
 		printf(_GREEN_CLR"[UDP Client]"_DEF_CLR" recv: ");
-		print_udphdr((struct udphdr *) (recv_pkt + ETH_HDRSZ + IP_HDRSZ));
-		printf(_LMAGENTA_CLR"%s "_LBLUE_CLR"%d%d%d%d"_DEF_CLR
-			" (%zu bytes)\n", recv_pkt + HDRSIZ,
-			(int) recv_pkt[HDRSIZ + DATASIZ],
-			(int) recv_pkt[HDRSIZ + DATASIZ + 1],
-			(int) recv_pkt[HDRSIZ + DATASIZ + 2],
-			(int) recv_pkt[HDRSIZ + DATASIZ + 3],
-			bytes);
+		print_ethhdr((struct ethhdr *) (recv_pkt));
+//		print_iphdr((struct iphdr *) (recv_pkt + ETH_HDRSZ));
+//		print_udphdr((struct udphdr *) (recv_pkt + ETH_HDRSZ + IP_HDRSZ));
+		printf(_LMAGENTA_CLR"%s \t"_DEF_CLR"(%zu bytes)\n", recv_pkt + HDRSIZ, bytes);
 
 		printf("    %s\n", strncmp(send_pkt + HDRSIZ,
 			recv_pkt + HDRSIZ, DATASIZ)
@@ -172,14 +175,14 @@ pktgen(char *pkt)
 	iph->version = 4;
 	iph->ihl = sizeof(struct iphdr) / sizeof(uint32_t);
 	iph->tos = 0;
-	iph->tot_len = 0;
+	iph->tot_len = htons(PKTSIZ - ETH_HDRSZ);
 	iph->id = htons(0x666);
 	iph->frag_off = 0;
 	iph->ttl = 0x40;
 	iph->protocol = IPPROTO_UDP;
-	iph->check = htons(0x0);
 	iph->saddr = inet_addr(CLI_ADDR);
 	iph->daddr = inet_addr(SERV_ADDR);
+	iph->check = ipv4_checksum((uint16_t *) iph, IP_HDRSZ);
 
 	/* UDP header init */
 
@@ -187,7 +190,7 @@ pktgen(char *pkt)
 
 	udph->uh_sport = htons(port_clnt);
 	udph->uh_dport = htons(port_serv);
-	udph->uh_ulen = htons(PKTSIZ - ETH_HDRSZ - IP_HDRSZ);
+	udph->uh_ulen = htons(UDP_HDRSZ + DATASIZ);
 	udph->uh_sum = htons(0x0);
 
 	/* Datagen */
@@ -196,7 +199,7 @@ pktgen(char *pkt)
 
 	int start = (int)' ';
 	int end = (int)'~';
-	int i = 0;
+	unsigned int i = 0;
 
 	for (; i < DATASIZ - 1; ++i)
 		data[i] = (char)(start + rand() % (end - start));
@@ -204,5 +207,27 @@ pktgen(char *pkt)
 	data[i] = '\0';
 
 	memcpy(pkt + HDRSIZ, data, DATASIZ);
-	memset(pkt + HDRSIZ + DATASIZ, 0, PADDING);
+}
+
+// RFC 1071, Computing the Internet Checksum, September 1988
+// https://tools.ietf.org/html/rfc1071
+uint16_t
+ipv4_checksum(uint16_t *addr, int count)
+{
+	long sum = 0;
+
+	while (count > 1) {
+		sum += *(addr++);
+		count -= 2;
+	}
+
+	if (count > 0)
+		sum += *addr;
+
+	while (sum >> 16L)
+		sum = (sum & 0xffff) + (sum >> 16L);
+
+	sum = ~sum;
+
+	return (uint16_t) sum;
 }
