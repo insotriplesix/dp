@@ -84,14 +84,11 @@ static char *msgptr;
 
 static int device_open(struct inode *inod, struct file *filp)
 {
-//	static int counter = 0;
-
 	if (processes_use_dev > 0)
 		return -EBUSY;
 
 	processes_use_dev++;
 	printk(KERN_INFO "Open (%d)\n", processes_use_dev);
-//	sprintf(msg, "lul ~> %d\n", processes_use_dev);
 //	try_module_get(THIS_MODULE);
 
 	return 0;
@@ -111,31 +108,17 @@ static ssize_t device_read(struct file *filp, char *buf, size_t len, loff_t *off
 
 	msgptr = msg;
 
-	// if EOF
 	if (*msgptr == 0)
 		return 0;
 
-	// incorrect len
-//	if (len > MSGSIZ)
-//		return 0;
+	total = (len > MSGSIZ) ? MSGSIZ : len;
 
-	printk(KERN_INFO "%zu is len\n", len);
-
-//	total = (len > MSGSIZ) ? MSGSIZ : len;
-
-//	for (rbytes = 0; rbytes < total; rbytes++)
-//		put_user(*(msgptr++), buf++);
-/*
-	while (len && *msgptr) {
+	for (rbytes = 0; rbytes < total; rbytes++)
 		// send msg data from kernel to the buffer in user space
 		put_user(*(msgptr++), buf++);
 
-		len--;
-		rbytes++;
-	}
-*/
-//	printk(KERN_INFO "%d bytes sent, returned message from <%s>: %s\n",
-//		rbytes, DEVICE_NAME, msg);
+	printk(KERN_INFO "%d bytes sent, returned message from <%s>: %s\n",
+		rbytes, DEVICE_NAME, msg);
 
 	return rbytes;
 }
@@ -146,33 +129,16 @@ static ssize_t device_write(struct file *filp, const char *buf, size_t len, loff
 
 	msgptr = msg;
 
-	// if EOF
 	if (*msgptr == 0)
 		return 0;
 
-	// incorrect len
-//	if (len > MSGSIZ) {
-//		printk(KERN_ALERT "The input string is too long, maxlen is %d\n", MSGSIZ);
-//		return 0;
-//	}
+	total = (len > MSGSIZ) ? MSGSIZ : len;
 
-	printk(KERN_INFO "%zu is len\n", len);
-
-//	total = (len > MSGSIZ) ? MSGSIZ : len;
-
-//	for (wbytes = 0; wbytes < total; wbytes++)
-//		get_user(*(msgptr++), buf++);
-
-/*
-	while (len && *msgptr) {
+	for (wbytes = 0; wbytes < total; wbytes++)
 		// get value from user buffer & copy it to the kernel space
 		get_user(*(msgptr++), buf++);
 
-		len--;
-		wbytes++;
-	}
-*/
-//	printk(KERN_INFO "%d bytes was written\n", wbytes);
+	printk(KERN_INFO "%d bytes was written\n", wbytes);
 
 	return wbytes;
 }
