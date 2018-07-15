@@ -104,7 +104,7 @@ static int device_release(struct inode *inod, struct file *filp)
 
 static ssize_t device_read(struct file *filp, char *buf, size_t len, loff_t *off)
 {
-	int rbytes, total;
+	ssize_t rbytes, total;
 
 	msgptr = msg;
 
@@ -117,7 +117,7 @@ static ssize_t device_read(struct file *filp, char *buf, size_t len, loff_t *off
 		// send msg data from kernel to the buffer in user space
 		put_user(*(msgptr++), buf++);
 
-	printk(KERN_INFO "%d bytes sent, returned message from <%s>: %s\n",
+	printk(KERN_INFO "%zu bytes sent, returned message from <%s>: %s\n",
 		rbytes, DEVICE_NAME, msg);
 
 	return rbytes;
@@ -125,7 +125,7 @@ static ssize_t device_read(struct file *filp, char *buf, size_t len, loff_t *off
 
 static ssize_t device_write(struct file *filp, const char *buf, size_t len, loff_t *off)
 {
-	int wbytes, total;
+	ssize_t wbytes, total;
 
 	msgptr = msg;
 
@@ -138,7 +138,7 @@ static ssize_t device_write(struct file *filp, const char *buf, size_t len, loff
 		// get value from user buffer & copy it to the kernel space
 		get_user(*(msgptr++), buf++);
 
-	printk(KERN_INFO "%d bytes was written\n", wbytes);
+	printk(KERN_INFO "%zu bytes was written\n", wbytes);
 
 	return wbytes;
 }
