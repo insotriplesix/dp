@@ -2,6 +2,9 @@
  * sys666.h
  */
 
+#ifndef __SYS666_H__
+#define __SYS666_H__
+
 #include <linux/init.h>
 #include <linux/fs.h>
 #include <linux/kernel.h>
@@ -17,3 +20,5 @@ sys666_show(struct kobject *kobj, struct kobj_attribute *attr, char *ubuf);
 
 static ssize_t
 sys666_store(struct kobject *kobj, struct kobj_attribute *attr, const char *ubuf, size_t count);
+
+#endif
