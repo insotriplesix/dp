@@ -28,7 +28,7 @@ void
 ioctl_get_kbuf(int fd)
 {
 	char buf[MSGSIZ];
-	int ret = ioctl(fd, IOCTL_GET_KBUF, &buf);
+	int ret = ioctl(fd, IOCTL_GET_KBUF, buf);
 
 	if (ret < 0) {
 		printf("ioctl_get_kbuf() failed with %d\n", ret);
