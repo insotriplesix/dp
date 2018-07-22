@@ -120,7 +120,7 @@ device_ioctl(struct file *filp, unsigned int ioctl_num, unsigned long ioctl_para
 
 		break;
 	case IOCTL_GET_KBUF:
-	ret = device_read(filp, (char *) data, MSGSIZ, 0);
+		ret = device_read(filp, (char *) data, MSGSIZ, 0);
 		if (ret < 0)
 			printk(KERN_ALERT " ioctl_get_kbuf() failed with %ld\n", ret);
 
