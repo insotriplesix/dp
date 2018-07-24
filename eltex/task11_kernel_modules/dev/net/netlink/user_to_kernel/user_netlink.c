@@ -75,7 +75,7 @@ int main(void)
 
 	ret = sendmsg(sock_fd, &mhdr, 0);
 	if (ret < 0) {
-		fprintf(stderr, "Failed sending message to the kernel, errno: %s\n",
+		fprintf(stderr, "Failed to send the message to the kernel. Err: %s\n",
 			strerror(errno));
 		return ret;
 	}
@@ -84,12 +84,12 @@ int main(void)
 
 	ret = recvmsg(sock_fd, &mhdr, 0);
 	if (ret < 0) {
-		fprintf(stderr, "Failed receiving message from the kernel, errno: %s\n",
+		fprintf(stderr, "Failed to receive the message from the kernel. Err: %s\n",
 			strerror(errno));
 		return ret;
 	}
 
-	printf("Reply message: %s\n", (char *) NLMSG_DATA(nlh));
+	printf("Reply: %s\n", (char *) NLMSG_DATA(nlh));
 
 	close(sock_fd);
 
