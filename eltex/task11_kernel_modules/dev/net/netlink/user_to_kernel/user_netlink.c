@@ -8,7 +8,6 @@
 #include <sys/socket.h>
 
 #define MSGSIZ 256
-#define NETLINK_USER 31
 
 #define MODULE_NAME "netlink3000"
 
@@ -23,7 +22,7 @@ int main(void)
 
 	pid = getpid();						// pid of cur proc
 
-	sock_fd = socket(PF_NETLINK, SOCK_RAW, NETLINK_USER);
+	sock_fd = socket(PF_NETLINK, SOCK_RAW, NETLINK_USERSOCK);
 	if (sock_fd < 0) {
 		fprintf(stderr, "Cannot create socket for '%s'\n", MODULE_NAME);
 		return -1;

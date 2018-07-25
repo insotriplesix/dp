@@ -12,7 +12,6 @@
 #include "netlink3000.h"
 
 #define MODULE_NAME "netlink3000"
-#define NETLINK_USER 31
 
 struct sock *nl3000_sock;
 
@@ -26,7 +25,7 @@ static int __init kmodule_start(void)
 
 	printk(KERN_INFO "Initialize 'netlink3000' module\n");
 
-	nl3000_sock = netlink_kernel_create(&init_net, NETLINK_USER, &cfg);
+	nl3000_sock = netlink_kernel_create(&init_net, NETLINK_USERSOCK, &cfg);
 	if (nl3000_sock == NULL) {
 		printk(KERN_ALERT "Socket creation error\n");
 		return -ENOMEM;
