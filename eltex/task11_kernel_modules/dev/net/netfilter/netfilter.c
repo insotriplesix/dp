@@ -32,7 +32,7 @@ static int __init kmodule_start(void)
 	nfho.hooknum = NF_INET_PRE_ROUTING;
 	nfho.priority = NF_IP_PRI_FIRST;
 
-	ret = nf_register_net_hook(NULL, &nfho);
+	ret = nf_register_net_hook(&init_net, &nfho);
 	if (ret < 0) {
 		printk(KERN_ALERT "Can't register the net hook\n");
 		return ret;
@@ -43,7 +43,7 @@ static int __init kmodule_start(void)
 
 static void __exit kmodule_end(void)
 {
-	nf_unregister_net_hook(NULL, &nfho);
+	nf_unregister_net_hook(&init_net, &nfho);
 	printk(KERN_INFO "Module successfully unloaded\n");
 }
 
@@ -54,15 +54,14 @@ static void __exit kmodule_end(void)
 static unsigned int nf_hook_func(void *priv, struct sk_buff *skb,
 	const struct nf_hook_state *state)
 {
-//	struct iphdr *iph = (struct iphdr *) skb_network_header(skb);
 	struct tcphdr *tcph = (struct tcphdr *) skb_transport_header(skb);
 
 	if (tcph->dest == htons(BLOCKED_PORT)) {
-		printk(KERN_INFO " packet [] dropped\n");
+		printk(KERN_INFO " packet dropped\n");
 		return NF_DROP;
 	}
 
-	printk(KERN_INFO " packet [] accepted\n");
+	printk(KERN_INFO " packet accepted\n");
 
 	return NF_ACCEPT;
 }
