@@ -5,11 +5,10 @@ import telebot
 import time
 
 from bs4 import BeautifulSoup
-from config import TOKEN
 from urllib import request
 
 # Create an object of a bot
-bot = telebot.TeleBot(TOKEN)
+bot = telebot.TeleBot("TOKEN")
 
 ''' ---------------------------------------------------------------------------------------------------------------- '''
 
