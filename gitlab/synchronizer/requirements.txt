@@ -1,0 +1,4 @@
+Synchronizer
+docopt == 0.6.2
+gitpython >= 3.0.2
+python-gitlab >= 1.11.0
