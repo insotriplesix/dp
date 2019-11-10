@@ -1,1 +1,0 @@
-# Contests and something
