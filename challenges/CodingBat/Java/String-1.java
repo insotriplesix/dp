@@ -378,3 +378,124 @@ without the substring at the beginning, so "HelloHe" yields "lloHe". The substri
 itself, so "Hi" yields "". Otherwise, return the original string unchanged.
 */
 
+public String without2(String str) {
+  int len = str.length();
+  if (len < 2) return str;
+
+  return str.substring(0, 2).equals(str.substring(len - 2, len))
+    ? str.substring(2, len) : str;
+}
+
+
+/*
+Given a string, return a version without the first 2 chars. Except keep the first char if it is 'a'
+and keep the second char if it is 'b'. The string may be any length. Harder than it looks.
+*/
+
+public String deFront(String str) {
+  int len = str.length();
+  String result = "";
+
+  switch (len) {
+    case 2:
+      if (str.charAt(0) == 'a')
+        result += "a";
+      if (str.charAt(1) == 'b')
+        result += "b";
+      break;
+    case 1:
+      if (str.charAt(0) == 'a')
+        result += "a";
+      break;
+    case 0:
+      break;
+    default:
+      if (str.charAt(0) == 'a')
+        result += "a";
+      if (str.charAt(1) == 'b')
+        result += "b";
+      result += str.substring(2, len);
+      break;
+  }
+
+  return result;
+}
+
+
+/*
+Given a string and a second "word" string, we'll say that the word matches the string if it appears
+at the front of the string, except its first char does not need to match exactly. On a match, return
+the front of the string, or otherwise return the empty string. So, so with the string "hippo" the
+word "hi" returns "hi" and "xip" returns "hip". The word will be at least length 1.
+*/
+
+public String startWord(String str, String word) {
+  int lenS = str.length();
+  int lenW = word.length();
+
+  if (lenW > lenS)
+    return "";
+
+  if (lenW < 2)
+    return str.substring(0, 1);
+
+  Boolean isMatch = str.substring(1, lenW).equals(word.substring(1, lenW));
+
+  return isMatch ? str.substring(0, lenW) : "";
+}
+
+
+/*
+Given a string, if the first or last chars are 'x', return the string without those 'x' chars, and
+otherwise return the string unchanged.
+*/
+
+public String withoutX(String str) {
+  int len = str.length();
+  if (len == 0) return "";
+
+  String result = "";
+
+  int l = 0, r = len;
+
+  if (str.charAt(0) == 'x' && len > 1)
+    l++;
+  if (str.charAt(len - 1) == 'x')
+    r--;
+
+  return str.substring(l, r);
+}
+
+
+/*
+Given a string, if one or both of the first 2 chars is 'x', return the string without those 'x'
+chars, and otherwise return the string unchanged. This is a little harder than it looks.
+*/
+
+public String withoutX2(String str) {
+  int len = str.length();
+  String result = "";
+
+  int l = 0;
+
+  switch (len) {
+    case 1:
+      if (str.charAt(0) == 'x')
+        l++;
+      break;
+    case 0:
+      break;
+    default:
+      if (str.charAt(0) == 'x')
+        l++;
+      else {
+        l++;
+        result += Character.toString(str.charAt(0));
+      }
+      if (str.charAt(1) == 'x')
+        l++;
+      break;
+  }
+
+  return result + str.substring(l, len);
+}
