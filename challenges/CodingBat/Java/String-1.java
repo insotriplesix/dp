@@ -307,3 +307,74 @@ public String lastTwo(String str) {
     + str.substring(len - 2, len - 1);
 }
 
+
+/*
+Given a string, if the string begins with "red" or "blue" return that color string, otherwise return
+the empty string.
+*/
+
+public String seeColor(String str) {
+  int len = str.length();
+
+  if (len >= 4) {
+    if (str.substring(0, 3).equals("red"))
+      return "red";
+    else if (str.substring(0, 4).equals("blue"))
+      return "blue";
+    else
+      return "";
+  } else if (len == 3 && str.substring(0, 3).equals("red")) {
+    return "red";
+  } else {
+    return "";
+  }
+}
+
+
+/*
+Given a string, return true if the first 2 chars in the string also appear at the end of the string,
+such as with "edited".
+*/
+
+public boolean frontAgain(String str) {
+  int len = str.length();
+  if (len < 2) return false;
+
+  String front = str.substring(0, 2);
+
+  return str.substring(len - 2, len).equals(front);
+}
+
+
+/*
+Given two strings, append them together (known as "concatenation") and return the result. However,
+if the strings are different lengths, omit chars from the longer string so it is the same length as
+the shorter string. So "Hello" and "Hi" yield "loHi". The strings may be any length.
+*/
+
+public String minCat(String a, String b) {
+  int lenA = a.length();
+  int lenB = b.length();
+  int len = lenA < lenB ? lenA : lenB;
+
+  return a.substring(lenA - len, lenA) + b.substring(lenB - len, lenB);
+}
+
+
+/*
+Given a string, return a new string made of 3 copies of the first 2 chars of the original string.
+The string may be any length. If there are fewer than 2 chars, use whatever is there.
+*/
+
+public String extraFront(String str) {
+  int len = str.length() > 2 ? 2 : str.length();
+  return str.substring(0, len) + str.substring(0, len) + str.substring(0, len);
+}
+
+
+/*
+Given a string, if a length 2 substring appears at both its beginning and end, return a string
+without the substring at the beginning, so "HelloHe" yields "lloHe". The substring may overlap with
+itself, so "Hi" yields "". Otherwise, return the original string unchanged.
+*/
+
