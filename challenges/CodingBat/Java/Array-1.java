@@ -103,4 +103,83 @@ public int sum2(int[] nums) {
 }
 
 
+/*
+Given 2 int arrays, a and b, each length 3, return a new array length 2 containing their middle
+elements.
+*/
+
+public int[] middleWay(int[] a, int[] b) {
+  int[] result = { a[1], b[1] };
+  return result;
+}
+
+
+/*
+Given an array of ints, return a new array length 2 containing the first and last elements from the
+original array. The original array will be length 1 or more.
+*/
+
+public int[] makeEnds(int[] nums) {
+  int len = nums.length;
+  int[] result = { nums[0], nums[len - 1] };
+  return result;
+}
+
+
+/*
+Given an int array length 2, return true if it contains a 2 or a 3.
+*/
+
+public boolean has23(int[] nums) {
+  for (int i = 0; i < nums.length; i++)
+    if (nums[i] == 2 || nums[i] == 3)
+      return true;
+  return false;
+}
+
+
+/*
+Given an int array length 2, return true if it does not contain a 2 or 3.
+*/
+
+public boolean no23(int[] nums) {
+  for (int i = 0; i < nums.length; i++)
+    if (nums[i] == 2 || nums[i] == 3)
+      return false;
+  return true;
+}
+
+
+/*
+Given an int array, return a new array with double the length where its last element is the same
+as the original array, and all the other elements are 0. The original array will be length 1 or
+more. Note: by default, a new int array contains all 0's.
+*/
+
+public int[] makeLast(int[] nums) {
+  int[] result = new int[nums.length * 2];
+  result[nums.length * 2 - 1] = nums[nums.length - 1];
+  return result;
+}
+
+
+/*
+Given an int array, return true if the array contains 2 twice, or 3 twice. The array will be
+length 0, 1, or 2.
+*/
+
+public boolean double23(int[] nums) {
+  int cnt2 = 0, cnt3 = 0;
+
+  for (int i = 0; i < nums.length; i++) {
+    if (nums[i] == 2)
+      cnt2++;
+    if (nums[i] == 3)
+      cnt3++;
+    if (cnt2 == 2 || cnt3 == 2)
+      return true;
+  }
+
+  return false;
+}
 
