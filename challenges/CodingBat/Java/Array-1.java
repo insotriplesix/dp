@@ -200,3 +200,126 @@ public int[] fix23(int[] nums) {
   return nums;
 }
 
+
+/*
+Start with 2 int arrays, a and b, of any length. Return how many of the arrays have 1 as their
+first element.
+*/
+
+public int start1(int[] a, int[] b) {
+  int cnt = 0;
+
+  for (int i = 0; i < a.length; i++) {
+    if (a[0] == 1) {
+      cnt++;
+    }
+    break;
+  }
+
+  for (int i = 0; i < b.length; i++) {
+    if (b[0] == 1) {
+      cnt++;
+    }
+    break;
+  }
+
+  return cnt;
+}
+
+
+/*
+Start with 2 int arrays, a and b, each length 2. Consider the sum of the values in each array.
+Return the array which has the largest sum. In event of a tie, return a.
+*/
+
+public int[] biggerTwo(int[] a, int[] b) {
+  int win = 0;
+  int sumA = 0, sumB = 0;
+
+  for (int i = 0; i < a.length; i++)
+    sumA += a[i];
+
+  for (int i = 0; i < b.length; i++)
+    sumB += b[i];
+
+  win = sumA - sumB;
+
+  return win >= 0 ? a : b;
+}
+
+
+/*
+Given an array of ints of even length, return a new array length 2 containing the middle two elements
+from the original array. The original array will be length 2 or more.
+*/
+
+public int[] makeMiddle(int[] nums) {
+  int[] result = {
+    nums[nums.length / 2 - 1],
+    nums[nums.length / 2]
+  };
+  return result;
+}
+
+
+/*
+Given 2 int arrays, each length 2, return a new array length 4 containing all their elements.
+*/
+
+public int[] plusTwo(int[] a, int[] b) {
+  int[] result = new int[a.length + b.length];
+  int i, j;
+
+  for (i = 0; i < a.length; i++)
+    result[i] = a[i];
+
+  for (j = 0; j < b.length; j++, i++)
+    result[i] = b[j];
+
+  return result;
+}
+
+
+/*
+Given an array of ints, swap the first and last elements in the array. Return the modified array.
+The array length will be at least 1.
+*/
+
+public int[] swapEnds(int[] nums) {
+  int tmp = nums[0];
+  nums[0] = nums[nums.length - 1];
+  nums[nums.length - 1] = tmp;
+  return nums;
+}
+
+
+/*
+Given an array of ints of odd length, return a new array length 3 containing the elements from the
+middle of the array. The array length will be at least 3.
+*/
+
+public int[] midThree(int[] nums) {
+  int[] result = {
+    nums[nums.length / 2 - 1],
+    nums[nums.length / 2],
+    nums[nums.length / 2 + 1]
+  };
+  return result;
+}
+
+
+/*
+Given an array of ints of odd length, look at the first, last, and middle values in the array and
+return the largest. The array length will be a least 1.
+*/
+
+public int maxTriple(int[] nums) {
+  int first = nums[0];
+  int mid = nums[nums.length / 2];
+  int last = nums[nums.length - 1];
+
+  return first > mid ? (
+    first > last ? first : last
+  ) : (last > mid ? last : mid);
+}
+
