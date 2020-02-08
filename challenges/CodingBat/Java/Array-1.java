@@ -325,6 +325,22 @@ public int maxTriple(int[] nums) {
 
 
 /*
+Given an int array of any length, return a new array of its first 2 elements. If the array is smaller
+than length 2, use whatever elements are present.
+*/
+
+public int[] frontPiece(int[] nums) {
+  int len = nums.length > 2 ? 2 : nums.length;
+  int[] result = new int[len];
+
+  for (int i = 0; i < len; i++)
+    result[i] = nums[i];
+
+  return result;
+}
+
+
+/*
 We'll say that a 1 immediately followed by a 3 in an array is an "unlucky" 1. Return true if the
 given array contains an unlucky 1 in the first 2 or last 2 positions in the array.
 */
@@ -338,5 +354,62 @@ public boolean unlucky1(int[] nums) {
     return true;
 
   return false;
+}
+
+
+/*
+Given 2 int arrays, a and b, return a new array length 2 containing, as much as will fit, the
+elements from a followed by the elements from b. The arrays may be any length, including 0, but
+there will be 2 or more elements available between the 2 arrays.
+*/
+
+public int[] make2(int[] a, int[] b) {
+  int maxLen = 2;
+  int cnt = 0;
+
+  int[] result = new int[maxLen];
+
+  for (int i = 0; i < a.length; i++) {
+    if (cnt == maxLen)
+      return result;
+
+    result[cnt++] = a[i];
+  }
+
+  for (int j = 0; j < b.length; j++) {
+    if (cnt == maxLen)
+      return result;
+
+    result[cnt++] = b[j];
+  }
+
+  return result;
+}
+
+
+/*
+Given 2 int arrays, a and b, of any length, return a new array with the first element of each array.
+If either array is length 0, ignore that array.
+*/
+
+public int[] front11(int[] a, int[] b) {
+  int cnt = 0;
+  int len = 0;
+
+  if (a.length > 0)
+    len++;
+
+  if (b.length > 0)
+    len++;
+
+  int[] result = new int[len];
+
+  if (a.length != 0)
+    result[cnt++] = a[0];
+
+  if (b.length != 0)
+    result[cnt++] = b[0];
+
+  return result;
 }
 
