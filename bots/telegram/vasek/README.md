@@ -1,18 +1,18 @@
 # Vasek
 
 <p>
-  <img src="https://github.com/5aboteur/Third-Reich-Secrets/blob/master/Vasek/vasek.png" width="150"/>
+  <img src="https://github.com/5aboteur/dp/blob/master/bots/telegram/vasek/res/vasek.png" width="150"/>
 </p>
 
 ### --- Descr --------------------------
 
-Absolutely aggressive bot for Telegram. Still raw but lots of fun guaranteed.
+Absolutely aggressive bot for Telegram App. Still raw but lots of fun guaranteed.
 
 ### --- Func --------------------------
 
 #### v1.2
 
-* Added `/tits` and `/time` commands
+* Add `/tits` and `/time` commands
 * More bot answers
 
 #### v1.1
@@ -21,8 +21,8 @@ Absolutely aggressive bot for Telegram. Still raw but lots of fun guaranteed.
 
 #### v1.0
 
-* Implemented basic stuff
-* Added `/help` command
+* Implement basic stuff
+* Add `/help` command
 
 ### --- Refs --------------------------
 
