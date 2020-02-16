@@ -1,6 +1,6 @@
 # exercises list
 
-- [ ] acronym
+- [x] acronym
 - [ ] all-your-base
 - [ ] allergies
 - [ ] anagram
