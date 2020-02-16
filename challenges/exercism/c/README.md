@@ -1,4 +1,4 @@
-# tasks list
+# exercises list
 
 - [ ] acronym
 - [ ] all-your-base
