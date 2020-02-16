@@ -8,17 +8,13 @@
 
 static int is_first_character_of_word(const char *phrase, int index)
 {
-	if (
-		index != 0
-		&& isalpha(phrase[index])
-		&& !isalpha(phrase[index - 1])
-		&& phrase[index - 1] != '\''
-	)
-		return 1;
-	else if (index == 0)
-		return 1;
-	else
-		return 0;
+	char cur = phrase[index];
+
+	if (index == 0) return isalpha(cur);
+
+	char prev = phrase[index - 1];
+
+	return isalpha(cur) && !isalpha(prev) && prev != '\'';
 }
 
 char *abbreviate(const char *phrase)

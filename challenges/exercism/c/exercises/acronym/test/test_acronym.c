@@ -99,6 +99,14 @@ static void test_long_abbreviation(void)
    test_abbreviation(phrase, expected);
 }
 
+static void test_non_alpha_first_character(void)
+{
+//   TEST_IGNORE();
+   char *phrase = "`What About This`";
+   char *expected = "WAT";
+   test_abbreviation(phrase, expected);
+}
+
 int main(void)
 {
    UnityBegin("test/test_acronym.c");
@@ -113,5 +121,6 @@ int main(void)
    RUN_TEST(test_empty_string);
    RUN_TEST(test_all_words_starting_with_lowercase);
    RUN_TEST(test_long_abbreviation);
+   RUN_TEST(test_non_alpha_first_character);
    return UnityEnd();
 }
