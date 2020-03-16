@@ -1,0 +1,12 @@
+*.swp
+*.beam
+.DS_Store
+.class
+build/
+.gradle/
+.idea/
+*.iml
+bin/configlet
+bin/configlet.exe
+/exercises/.nb-gradle/
+**/out
