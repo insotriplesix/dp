@@ -3,9 +3,7 @@ fun main() {
     generateSequence(::readLine)
         .joinToString("\n")
         .split("\n")
-        .map {
-            it.trim().split("\t")
-        }
+        .map { it.trim().split("\t") }
         .groupBy({ it.first() }, { it.last().toInt() })
         .mapValues { entry -> entry.value.sum() / entry.value.size }
         .forEach(::printResult)
