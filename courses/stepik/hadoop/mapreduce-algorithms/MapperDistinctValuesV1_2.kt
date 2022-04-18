@@ -3,9 +3,7 @@ fun main() {
     generateSequence(::readLine)
         .joinToString("\n")
         .split("\n")
-        .map {
-            it.trim().split(",").last()
-        }
+        .map { it.trim().split(",").last() }
         .forEach(::printResult)
 }
 
